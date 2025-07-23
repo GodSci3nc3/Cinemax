@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.policine.controllers.Usuario" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #1e3c72;">
+    <children>
+        <!-- Background gradient effect using multiple overlapping rectangles -->
+        <AnchorPane prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #1e3c72;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <AnchorPane opacity="0.8" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #2a5298;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            </children>
+        </AnchorPane>
+
+        <!-- Main Container - Centered and Responsive -->
+        <VBox alignment="CENTER" maxWidth="350.0" minWidth="300.0" prefWidth="320.0" spacing="20.0" style="-fx-background-color: rgba(255, 255, 255, 0.15); -fx-background-radius: 20; -fx-border-color: rgba(255, 255, 255, 0.3); -fx-border-radius: 20; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0.3, 0, 5);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <!-- Header Section -->
+                <VBox alignment="CENTER" spacing="8.0">
+                    <children>
+                        <Label text="Policine" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="36.0" />
+                            </font>
+                        </Label>
+                        <Label text="Vive el Cine, Reserva el Momento" textFill="#E6F3FF">
+                            <font>
+                                <Font size="13.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+
+                <!-- Tab Buttons -->
+                <HBox alignment="CENTER" maxWidth="280.0" spacing="0.0" style="-fx-background-color: rgba(255, 255, 255, 0.1); -fx-background-radius: 10;">
+                    <children>
+                        <Button fx:id="btnIniciarSesion" mnemonicParsing="false" onAction="#switchToLogin" prefHeight="38.0" style="-fx-background-color: rgba(255, 255, 255, 0.25); -fx-background-radius: 10 0 0 10; -fx-border-width: 0; -fx-text-fill: white; -fx-font-weight: bold;" text="Iniciar Sesión" HBox.hgrow="ALWAYS">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                        </Button>
+                        <Button fx:id="btnRegistrarse" mnemonicParsing="false" onAction="#switchToRegister" prefHeight="38.0" style="-fx-background-color: transparent; -fx-background-radius: 0 10 10 0; -fx-border-width: 0; -fx-text-fill: #B0C4DE;" text="Registrarse" HBox.hgrow="ALWAYS">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                        </Button>
+                    </children>
+                </HBox>
+
+                <!-- Login Form -->
+                <VBox fx:id="loginForm" alignment="CENTER" maxWidth="280.0" spacing="18.0" visible="true">
+                    <children>
+                        <VBox spacing="12.0">
+                            <children>
+                                <TextField fx:id="txtUsuario" promptText="Nombre de usuario" style="-fx-background-color: rgba(255, 255, 255, 0.12); -fx-background-radius: 10; -fx-border-color: rgba(255, 255, 255, 0.4); -fx-border-radius: 10; -fx-border-width: 1; -fx-text-fill: white; -fx-prompt-text-fill: #B0C4DE;">
+                                    <font>
+                                        <Font size="13.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets bottom="12.0" left="16.0" right="16.0" top="12.0" />
+                                    </padding>
+                                </TextField>
+                                <PasswordField fx:id="txtContrasena" promptText="Contraseña" style="-fx-background-color: rgba(255, 255, 255, 0.12); -fx-background-radius: 10; -fx-border-color: rgba(255, 255, 255, 0.4); -fx-border-radius: 10; -fx-border-width: 1; -fx-text-fill: white; -fx-prompt-text-fill: #B0C4DE;">
+                                    <font>
+                                        <Font size="13.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets bottom="12.0" left="16.0" right="16.0" top="12.0" />
+                                    </padding>
+                                </PasswordField>
+                            </children>
+                        </VBox>
+
+                        <HBox alignment="CENTER_LEFT" spacing="15.0">
+                            <children>
+                                <CheckBox fx:id="chkRecordarme" mnemonicParsing="false" text="Recordarme" textFill="WHITE">
+                                    <font>
+                                        <Font size="11.0" />
+                                    </font>
+                                </CheckBox>
+                                <Hyperlink fx:id="linkOlvidasteContrasena" onAction="#forgotPassword" text="¿Olvidaste tu contraseña?" textFill="#87CEEB">
+                                    <font>
+                                        <Font size="11.0" />
+                                    </font>
+                                </Hyperlink>
+                            </children>
+                        </HBox>
+
+                        <Button fx:id="btnLogin" mnemonicParsing="false" onAction="#handleLogin" prefHeight="45.0" style="-fx-background-color: #FF6B35; -fx-background-radius: 10; -fx-border-width: 0; -fx-text-fill: white; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.4), 8, 0.3, 0, 3);" text="Iniciar Sesión" maxWidth="Infinity">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Button>
+                    </children>
+                </VBox>
+
+                <!-- Register Form -->
+                <VBox fx:id="registerForm" alignment="CENTER" maxWidth="280.0" spacing="15.0" visible="false">
+                    <children>
+                        <VBox spacing="10.0">
+                            <children>
+                                <TextField fx:id="txtNombreCompleto" promptText="Nombre completo" style="-fx-background-color: rgba(255, 255, 255, 0.12); -fx-background-radius: 10; -fx-border-color: rgba(255, 255, 255, 0.4); -fx-border-radius: 10; -fx-border-width: 1; -fx-text-fill: white; -fx-prompt-text-fill: #B0C4DE;">
+                                    <font>
+                                        <Font size="12.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+                                    </padding>
+                                </TextField>
+                                <TextField fx:id="txtEmailRegistro" promptText="Correo electrónico" style="-fx-background-color: rgba(255, 255, 255, 0.12); -fx-background-radius: 10; -fx-border-color: rgba(255, 255, 255, 0.4); -fx-border-radius: 10; -fx-border-width: 1; -fx-text-fill: white; -fx-prompt-text-fill: #B0C4DE;">
+                                    <font>
+                                        <Font size="12.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+                                    </padding>
+                                </TextField>
+                                <TextField fx:id="txtUsuarioRegistro" promptText="Nombre de usuario" style="-fx-background-color: rgba(255, 255, 255, 0.12); -fx-background-radius: 10; -fx-border-color: rgba(255, 255, 255, 0.4); -fx-border-radius: 10; -fx-border-width: 1; -fx-text-fill: white; -fx-prompt-text-fill: #B0C4DE;">
+                                    <font>
+                                        <Font size="12.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+                                    </padding>
+                                </TextField>
+                                <PasswordField fx:id="txtContrasenaRegistro" promptText="Contraseña" style="-fx-background-color: rgba(255, 255, 255, 0.12); -fx-background-radius: 10; -fx-border-color: rgba(255, 255, 255, 0.4); -fx-border-radius: 10; -fx-border-width: 1; -fx-text-fill: white; -fx-prompt-text-fill: #B0C4DE;">
+                                    <font>
+                                        <Font size="12.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+                                    </padding>
+                                </PasswordField>
+                                <PasswordField fx:id="txtConfirmarContrasena" promptText="Confirmar contraseña" style="-fx-background-color: rgba(255, 255, 255, 0.12); -fx-background-radius: 10; -fx-border-color: rgba(255, 255, 255, 0.4); -fx-border-radius: 10; -fx-border-width: 1; -fx-text-fill: white; -fx-prompt-text-fill: #B0C4DE;">
+                                    <font>
+                                        <Font size="12.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+                                    </padding>
+                                </PasswordField>
+                            </children>
+                        </VBox>
+
+                        <Button fx:id="btnRegister" mnemonicParsing="false" onAction="#handleRegister" prefHeight="45.0" style="-fx-background-color: #FF6B35; -fx-background-radius: 10; -fx-border-width: 0; -fx-text-fill: white; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.4), 8, 0.3, 0, 3);" text="Registrarse" maxWidth="Infinity">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Button>
+                    </children>
+                </VBox>
+            </children>
+            <padding>
+                <Insets bottom="40.0" left="35.0" right="35.0" top="40.0" />
+            </padding>
+        </VBox>
+    </children>
+</AnchorPane>
