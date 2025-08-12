@@ -1,4 +1,4 @@
-# Policine - Sistema de Reservas de Cine 🎬
+# Policine - Sistema de Reservas de Cine 
 
 <img src = "https://github.com/user-attachments/assets/310148fd-adce-43a9-8165-26a8064e3cc2" style = "height: 700px;">
 
