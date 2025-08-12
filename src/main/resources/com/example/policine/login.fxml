@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.policine.controllers.Usuario" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #1e3c72;">
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.policine.controllers.AuthController" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #1e3c72;">
     <children>
         <!-- Background gradient effect using multiple overlapping rectangles -->
         <AnchorPane prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #1e3c72;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
