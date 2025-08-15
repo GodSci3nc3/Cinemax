@@ -6,6 +6,7 @@ import com.example.policine.model.dao.SalaDAO;
 import com.example.policine.model.entities.Pelicula;
 import com.example.policine.model.entities.Funcion;
 import com.example.policine.model.entities.Sala;
+import com.example.policine.model.session.BookingSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -567,20 +568,39 @@ public class MovieListingController implements Initializable {
             return;
         }
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/policine/seatSelection.fxml"));
-        Parent movieListingRoot = loader.load();
+        try {
+            // Obtener datos de la sala
+            Sala salaSeleccionada = salaDAO.buscarPorId(selectedFuncion.getIdSala());
+            if (salaSeleccionada == null) {
+                showAlert("Error", "Error al cargar información de la sala", Alert.AlertType.ERROR);
+                return;
+            }
 
-        Stage currentStage = (Stage) bookSeatsButton.getScene().getWindow();
+            // Guardar datos en la sesión
+            BookingSession session = BookingSession.getInstance();
+            session.reset(); // Limpiar sesión anterior
+            session.setMovieData(selectedMovie, selectedFuncion, salaSeleccionada);
 
-        Scene seatSelectionScene = new Scene(movieListingRoot);
+            // Cargar la siguiente pantalla
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/policine/seatSelection.fxml"));
+            Parent seatSelectionRoot = loader.load();
 
-        currentStage.setScene(seatSelectionScene);
-        currentStage.setTitle("Cinemax - Selecciona tus asientos");
+            // Obtener el controlador y pasarle los datos
+            SeatSelectionController controller = loader.getController();
+            controller.initializeWithSessionData();
 
-        currentStage.centerOnScreen();
+            Stage currentStage = (Stage) bookSeatsButton.getScene().getWindow();
+            Scene seatSelectionScene = new Scene(seatSelectionRoot);
+            currentStage.setScene(seatSelectionScene);
+            currentStage.setTitle("Cinemax - Selecciona tus asientos");
+            currentStage.centerOnScreen();
 
-        System.out.println("Navegación exitosa a Seat Selection con la función: " + selectedFuncion.getIdFuncion());
+            System.out.println("Navegación exitosa a Seat Selection con la función: " + selectedFuncion.getIdFuncion());
 
+        } catch (Exception e) {
+            System.err.println("Error al navegar a selección de asientos: " + e.getMessage());
+            showAlert("Error", "Error al cargar la selección de asientos", Alert.AlertType.ERROR);
+        }
     }
 
     private void showAlert(String title, String message, Alert.AlertType alertType) {

@@ -6,10 +6,13 @@ import com.example.policine.model.dao.SalaDAO;
 import com.example.policine.model.entities.Funcion;
 import com.example.policine.model.entities.Pelicula;
 import com.example.policine.model.entities.Sala;
+import com.example.policine.model.session.BookingSession;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -17,8 +20,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class SeatSelectionController implements Initializable {
@@ -35,21 +41,14 @@ public class SeatSelectionController implements Initializable {
     @FXML private Button btnContinuar;
     @FXML private Button btnVolver;
 
-    // DAOs
-    private FuncionDAO funcionDAO;
-    private PeliculaDAO peliculaDAO;
-    private SalaDAO salaDAO;
-
-    // Data
-    private Funcion funcionActual;
-    private Pelicula peliculaActual;
-    private Sala salaActual;
-
     // Seat management
     private Set<String> selectedSeats;
     private Set<String> occupiedSeats;
     private Map<String, Button> seatButtons;
     private Map<String, Double> seatPrices;
+
+    // Session data
+    private BookingSession session;
 
     // Pricing
     private final double PRECIO_NORMAL = 10.00;
@@ -58,18 +57,15 @@ public class SeatSelectionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        inicializarDAOs();
+        session = BookingSession.getInstance();
         inicializarColecciones();
         configurarInterfaz();
-
-        // Cargar datos de ejemplo (puedes modificar esto para recibir parámetros)
-        cargarDatosEjemplo();
     }
 
-    private void inicializarDAOs() {
-        funcionDAO = new FuncionDAO();
-        peliculaDAO = new PeliculaDAO();
-        salaDAO = new SalaDAO();
+    public void initializeWithSessionData() {
+        cargarDatosDeSesion();
+        actualizarInterfaz();
+        generarAsientos();
     }
 
     private void inicializarColecciones() {
@@ -78,7 +74,7 @@ public class SeatSelectionController implements Initializable {
         seatButtons = new HashMap<>();
         seatPrices = new HashMap<>();
 
-        // Simular algunos asientos ocupados
+        // Simular algunos asientos ocupados (en un caso real, esto vendría de la base de datos)
         occupiedSeats.addAll(Arrays.asList("A1", "A2", "C5", "D10", "F15", "H20"));
     }
 
@@ -92,37 +88,27 @@ public class SeatSelectionController implements Initializable {
         });
     }
 
-    private void cargarDatosEjemplo() {
-        // En un caso real, estos datos vendrían como parámetros
-        // Por ahora usamos datos de ejemplo
-        try {
-            // Simular carga de función, película y sala
-            funcionActual = new Funcion(1,
-                    java.time.LocalDate.now(),
-                    java.time.LocalTime.of(19, 45),
-                    1, 2);
-
-            peliculaActual = new Pelicula(1, "El Viaje del Héroe", "Aventura", "PG-13", 120, "Español", "Una épica aventura...");
-            salaActual = new Sala(2, "Sala 2", 100, "Estándar", 1);
-
-            actualizarInterfaz();
-            generarAsientos();
-
-        } catch (Exception e) {
-            mostrarError("Error al cargar los datos: " + e.getMessage());
-        }
+    private void cargarDatosDeSesion() {
+        // Los datos ya están en la sesión, no necesitamos cargar nada adicional
     }
 
     private void actualizarInterfaz() {
-        if (peliculaActual != null) {
-            lblTituloPelicula.setText(peliculaActual.getTitulo());
+        Pelicula pelicula = session.getPelicula();
+        Funcion funcion = session.getFuncion();
+        Sala sala = session.getSala();
+
+        if (pelicula != null) {
+            lblTituloPelicula.setText(pelicula.getTitulo());
         }
 
-        if (funcionActual != null && salaActual != null) {
+        if (funcion != null && sala != null) {
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
             String detalles = String.format("%s • %s • %s",
-                    funcionActual.getHora().toString(),
-                    salaActual.getNombreSala(),
-                    "Hoy" // Puedes formatear la fecha como prefieras
+                    funcion.getHora().format(timeFormatter),
+                    sala.getNombreSala(),
+                    funcion.getFecha().format(dateFormatter)
             );
             lblDetallesFuncion.setText(detalles);
         }
@@ -296,6 +282,9 @@ public class SeatSelectionController implements Initializable {
         }
 
         actualizarPrecios();
+
+        // Actualizar sesión con descuento
+        session.setDescuento(descuentoAplicado);
     }
 
     private double calcularSubtotal() {
@@ -306,27 +295,49 @@ public class SeatSelectionController implements Initializable {
 
     @FXML
     private void volverAtras() {
-        // Implementar navegación hacia atrás
-        // Por ejemplo, cerrar la ventana actual o navegar a la vista anterior
-        System.out.println("Volviendo a la vista anterior...");
+        try {
+            // Limpiar datos de asientos de la sesión
+            session.setSeatData(new HashSet<>(), new HashMap<>());
 
-        // Ejemplo de cómo cerrar la ventana actual
-        // ((Stage) btnVolver.getScene().getWindow()).close();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/policine/movieListing.fxml"));
+            Parent movieListingRoot = loader.load();
+
+            Stage currentStage = (Stage) btnVolver.getScene().getWindow();
+            Scene movieListingScene = new Scene(movieListingRoot);
+            currentStage.setScene(movieListingScene);
+            currentStage.setTitle("Cinemax - Cartelera");
+            currentStage.centerOnScreen();
+
+        } catch (IOException e) {
+            System.err.println("Error al volver a movie listing: " + e.getMessage());
+            mostrarError("Error al cargar la pantalla anterior");
+        }
     }
 
     @FXML
-    private void continuarAlCarrito() {
+    private void continuarAlCarrito() throws IOException {
         if (selectedSeats.isEmpty()) {
             mostrarAlerta("Debe seleccionar al menos un asiento");
             return;
         }
 
-        // Aquí implementarías la lógica para continuar al carrito
-        System.out.println("Continuando al carrito con asientos: " + selectedSeats);
-        System.out.println("Total a pagar: $" + String.format("%.2f", calcularSubtotal() - descuentoAplicado));
+        // Guardar datos de asientos en la sesión
+        session.setSeatData(selectedSeats, seatPrices);
 
-        // Ejemplo de navegación al carrito
-        // navegarACarrito();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/policine/foodSelection.fxml"));
+        Parent foodSelectionRoot = loader.load();
+
+        // Obtener el controlador y pasarle los datos
+        FoodSelectionController controller = loader.getController();
+        controller.initializeWithSessionData();
+
+        Stage currentStage = (Stage) btnContinuar.getScene().getWindow();
+        Scene foodSelectionScene = new Scene(foodSelectionRoot);
+        currentStage.setScene(foodSelectionScene);
+        currentStage.setTitle("Cinemax - Comida y Bebidas");
+        currentStage.centerOnScreen();
+
+        System.out.println("Navegación exitosa a Food Selection");
     }
 
     private void mostrarAlerta(String mensaje) {
@@ -343,39 +354,5 @@ public class SeatSelectionController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
-    }
-
-    // Métodos públicos para configurar datos desde otras vistas
-    public void setFuncion(Funcion funcion) {
-        this.funcionActual = funcion;
-        if (funcion != null) {
-            // Cargar película y sala relacionadas
-            cargarPeliculaYSala();
-            actualizarInterfaz();
-        }
-    }
-
-    private void cargarPeliculaYSala() {
-        try {
-            if (funcionActual != null) {
-                peliculaActual = peliculaDAO.buscarPorId(funcionActual.getIdPelicula());
-                salaActual = salaDAO.buscarPorId(funcionActual.getIdSala());
-            }
-        } catch (Exception e) {
-            System.err.println("Error al cargar película y sala: " + e.getMessage());
-        }
-    }
-
-    // Getters para otros controladores
-    public Set<String> getSelectedSeats() {
-        return new HashSet<>(selectedSeats);
-    }
-
-    public Map<String, Double> getSeatPrices() {
-        return new HashMap<>(seatPrices);
-    }
-
-    public double getTotalAmount() {
-        return calcularSubtotal() - descuentoAplicado;
     }
 }

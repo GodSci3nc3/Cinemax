@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.policine.controllers.FoodSelectionController" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: linear-gradient(to bottom, #1a237e, #3949ab);">
+    <children>
+        <!-- Header con botón de volver -->
+        <HBox alignment="CENTER_LEFT" layoutX="0.0" layoutY="0.0" prefHeight="80.0" prefWidth="1200.0" spacing="20.0">
+            <children>
+                <Button fx:id="btnVolver" mnemonicParsing="false" onAction="#handleVolverClick" prefHeight="40.0" prefWidth="120.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;" text="← Volver" />
+            </children>
+            <padding>
+                <Insets left="50.0" />
+            </padding>
+        </HBox>
+
+        <!-- Título -->
+        <Label alignment="CENTER" layoutX="0.0" layoutY="80.0" prefHeight="60.0" prefWidth="1200.0" style="-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold;" text="Comida y Bebidas" />
+
+        <!-- Grid de productos -->
+        <GridPane fx:id="productsGrid" alignment="CENTER" hgap="30.0" layoutX="100.0" layoutY="180.0" prefHeight="450.0" prefWidth="1000.0" vgap="30.0">
+            <columnConstraints>
+                <ColumnConstraints minWidth="10.0" prefWidth="235.0" />
+                <ColumnConstraints minWidth="10.0" prefWidth="235.0" />
+                <ColumnConstraints minWidth="10.0" prefWidth="235.0" />
+                <ColumnConstraints minWidth="10.0" prefWidth="235.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="200.0" />
+                <RowConstraints minHeight="10.0" prefHeight="200.0" />
+            </rowConstraints>
+
+            <!-- Producto 1: Palomitas Grandes -->
+            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: rgba(255, 255, 255, 0.1); -fx-background-radius: 15px; -fx-padding: 20;" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <children>
+                    <Label style="-fx-text-fill: #ffa726; -fx-font-size: 48px;" text="🍿" />
+                    <Label style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" text="Palomitas Grandes" />
+                    <Label fx:id="precioPalomitas" style="-fx-text-fill: #81c784; -fx-font-size: 14px;" text="8.50" />
+                    <Button fx:id="btnPalomitas" mnemonicParsing="false" onAction="#handleAddPalomitas" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #4fc3f7; -fx-background-radius: 50%; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;" text="+" />
+                </children>
+            </VBox>
+
+            <!-- Producto 2: Refresco Grande -->
+            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: rgba(255, 255, 255, 0.1); -fx-background-radius: 15px; -fx-padding: 20;" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <children>
+                    <Label style="-fx-text-fill: #42a5f5; -fx-font-size: 48px;" text="🥤" />
+                    <Label style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" text="Refresco Grande" />
+                    <Label fx:id="precioRefresco" style="-fx-text-fill: #81c784; -fx-font-size: 14px;" text="5.00" />
+                    <Button fx:id="btnRefresco" mnemonicParsing="false" onAction="#handleAddRefresco" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #4fc3f7; -fx-background-radius: 50%; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;" text="+" />
+                </children>
+            </VBox>
+
+            <!-- Producto 3: Nachos con Queso -->
+            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: rgba(255, 255, 255, 0.1); -fx-background-radius: 15px; -fx-padding: 20;" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                <children>
+                    <Label style="-fx-text-fill: #ffb74d; -fx-font-size: 48px;" text="🧀" />
+                    <Label style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" text="Nachos con Queso" />
+                    <Label fx:id="precioNachos" style="-fx-text-fill: #81c784; -fx-font-size: 14px;" text="9.75" />
+                    <Button fx:id="btnNachos" mnemonicParsing="false" onAction="#handleAddNachos" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #4fc3f7; -fx-background-radius: 50%; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;" text="+" />
+                </children>
+            </VBox>
+
+            <!-- Producto 4: Hot Dog Clásico -->
+            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: rgba(255, 255, 255, 0.1); -fx-background-radius: 15px; -fx-padding: 20;" GridPane.columnIndex="3" GridPane.rowIndex="0">
+                <children>
+                    <Label style="-fx-text-fill: #ff7043; -fx-font-size: 48px;" text="🌭" />
+                    <Label style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" text="Hot Dog Clásico" />
+                    <Label fx:id="precioHotdog" style="-fx-text-fill: #81c784; -fx-font-size: 14px;" text="7.25" />
+                    <Button fx:id="btnHotdog" mnemonicParsing="false" onAction="#handleAddHotdog" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #4fc3f7; -fx-background-radius: 50%; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;" text="+" />
+                </children>
+            </VBox>
+
+            <!-- Producto 5: Dulces Variados -->
+            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: rgba(255, 255, 255, 0.1); -fx-background-radius: 15px; -fx-padding: 20;" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <children>
+                    <Label style="-fx-text-fill: #e91e63; -fx-font-size: 48px;" text="🍬" />
+                    <Label style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" text="Dulces Variados" />
+                    <Label fx:id="precioDulces" style="-fx-text-fill: #81c784; -fx-font-size: 14px;" text="4.00" />
+                    <Button fx:id="btnDulces" mnemonicParsing="false" onAction="#handleAddDulces" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #4fc3f7; -fx-background-radius: 50%; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;" text="+" />
+                </children>
+            </VBox>
+
+            <!-- Producto 6: Combo Familiar -->
+            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: rgba(255, 255, 255, 0.1); -fx-background-radius: 15px; -fx-padding: 20;" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                <children>
+                    <Label style="-fx-text-fill: #ff9800; -fx-font-size: 48px;" text="🍿" />
+                    <Label style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" text="Combo Familiar" />
+                    <Label fx:id="precioCombo" style="-fx-text-fill: #81c784; -fx-font-size: 14px;" text="25.00" />
+                    <Button fx:id="btnCombo" mnemonicParsing="false" onAction="#handleAddCombo" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #4fc3f7; -fx-background-radius: 50%; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;" text="+" />
+                </children>
+            </VBox>
+
+            <!-- Carrito de compras (espacio vacío para mostrar items) -->
+            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: rgba(255, 255, 255, 0.05); -fx-background-radius: 15px; -fx-padding: 20; -fx-border-color: rgba(255, 255, 255, 0.2); -fx-border-radius: 15px; -fx-border-width: 2px;" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                <children>
+                    <Label style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" text="Tu Carrito" />
+                    <Label fx:id="lblItemsCarrito" style="-fx-text-fill: #81c784; -fx-font-size: 14px;" text="0 items" />
+                    <Label fx:id="lblTotalCarrito" style="-fx-text-fill: #4fc3f7; -fx-font-size: 16px; -fx-font-weight: bold;" text="0.00" />
+                    <Button fx:id="btnVerCarrito" mnemonicParsing="false" onAction="#handleVerCarrito" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: #4fc3f7; -fx-background-radius: 15px; -fx-text-fill: white; -fx-font-size: 12px; -fx-cursor: hand;" text="Ver Carrito" visible="false" />
+                </children>
+            </VBox>
+        </GridPane>
+
+        <!-- Botones inferiores -->
+        <HBox alignment="CENTER" layoutX="0.0" layoutY="680.0" prefHeight="80.0" prefWidth="1200.0" spacing="50.0">
+            <children>
+                <Button fx:id="btnNoGracias" mnemonicParsing="false" onAction="#handleNoGracias" prefHeight="45.0" prefWidth="150.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand; -fx-border-color: white; -fx-border-radius: 25px; -fx-border-width: 2px; -fx-background-radius: 25px;" text="No, gracias" />
+                <Button fx:id="btnContinuar" mnemonicParsing="false" onAction="#handleContinuar" prefHeight="45.0" prefWidth="150.0" style="-fx-background-color: #4fc3f7; -fx-background-radius: 25px; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;" text="Continuar" />
+            </children>
+        </HBox>
+    </children>
+</AnchorPane>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.policine.controllers.OrderSummaryController"
+      prefHeight="800.0" prefWidth="400.0"
+      style="-fx-background-color: #1a1d29;">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="15.0"
+          style="-fx-background-color: #141721; -fx-padding: 0 20 0 20;">
+        <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack"
+                style="-fx-background-color: transparent; -fx-text-fill: #8b9dc3; -fx-font-size: 16px; -fx-border-color: transparent;">
+            <text>&lt; Volver</text>
+        </Button>
+        <Label text="Checkout" textFill="#ffffff">
+            <font>
+                <Font name="System Bold" size="20.0" />
+            </font>
+        </Label>
+    </HBox>
+
+    <!-- Content -->
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                style="-fx-background: #1a1d29; -fx-background-color: #1a1d29;">
+        <content>
+            <VBox spacing="20.0" style="-fx-padding: 20;">
+
+                <!-- Resumen del Pedido - Container dinámico -->
+                <VBox spacing="15.0" style="-fx-background-color: #252b3d; -fx-background-radius: 12; -fx-padding: 20;">
+                    <Label text="Resumen del Pedido" textFill="#ffffff">
+                        <font>
+                            <Font name="System Bold" size="18.0" />
+                        </font>
+                    </Label>
+
+                    <!-- Este VBox será poblado dinámicamente por el controlador -->
+                    <VBox fx:id="orderItemsContainer" spacing="12.0">
+                        <!-- Los elementos se agregarán aquí dinámicamente -->
+                    </VBox>
+
+                    <!-- Total label oculto para compatibilidad con el controlador -->
+                    <Label fx:id="totalLabel" visible="false" managed="false" />
+                </VBox>
+
+                <!-- Opciones de Entrega -->
+                <VBox spacing="15.0" style="-fx-background-color: #252b3d; -fx-background-radius: 12; -fx-padding: 20;">
+                    <Label text="Opciones de Entrega" textFill="#ffffff">
+                        <font>
+                            <Font name="System Bold" size="18.0" />
+                        </font>
+                    </Label>
+
+                    <VBox spacing="10.0">
+                        <RadioButton fx:id="pickupRadio" selected="true" text="Recoger en Taquilla" textFill="#ffffff"
+                                     style="-fx-text-fill: #ffffff;">
+                            <toggleGroup>
+                                <ToggleGroup fx:id="deliveryGroup" />
+                            </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="deliveryRadio" text="Entrega en tu Asiento" textFill="#ffffff"
+                                     toggleGroup="$deliveryGroup"
+                                     style="-fx-text-fill: #ffffff;" />
+                    </VBox>
+                </VBox>
+
+                <!-- Detalles de Pago -->
+                <VBox spacing="15.0" style="-fx-background-color: #252b3d; -fx-background-radius: 12; -fx-padding: 20;">
+                    <Label text="Detalles de Pago" textFill="#ffffff">
+                        <font>
+                            <Font name="System Bold" size="18.0" />
+                        </font>
+                    </Label>
+
+                    <VBox spacing="12.0">
+                        <!-- Número de Tarjeta -->
+                        <VBox spacing="5.0">
+                            <Label text="Número de Tarjeta" textFill="#8b9dc3">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                            <TextField fx:id="cardNumberField" promptText="XXXX XXXX XXXX XXXX"
+                                       style="-fx-background-color: #3a4258; -fx-text-fill: #ffffff; -fx-prompt-text-fill: #6c7b8a; -fx-background-radius: 8; -fx-border-color: transparent; -fx-padding: 12;" />
+                        </VBox>
+
+                        <!-- Fecha de Vencimiento y CVC -->
+                        <HBox spacing="10.0">
+                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                <Label text="Fecha de Vencimiento" textFill="#8b9dc3">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                </Label>
+                                <TextField fx:id="expiryField" promptText="MM/AA"
+                                           style="-fx-background-color: #3a4258; -fx-text-fill: #ffffff; -fx-prompt-text-fill: #6c7b8a; -fx-background-radius: 8; -fx-border-color: transparent; -fx-padding: 12;" />
+                            </VBox>
+                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                <Label text="CVC" textFill="#8b9dc3">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                </Label>
+                                <TextField fx:id="cvcField" promptText="XXX"
+                                           style="-fx-background-color: #3a4258; -fx-text-fill: #ffffff; -fx-prompt-text-fill: #6c7b8a; -fx-background-radius: 8; -fx-border-color: transparent; -fx-padding: 12;" />
+                            </VBox>
+                        </HBox>
+
+                        <!-- Nombre en la Tarjeta -->
+                        <VBox spacing="5.0">
+                            <Label text="Nombre en la Tarjeta" textFill="#8b9dc3">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                            <TextField fx:id="cardHolderField" promptText="Nombre Completo"
+                                       style="-fx-background-color: #3a4258; -fx-text-fill: #ffffff; -fx-prompt-text-fill: #6c7b8a; -fx-background-radius: 8; -fx-border-color: transparent; -fx-padding: 12;" />
+                        </VBox>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </content>
+    </ScrollPane>
+
+    <!-- Bottom Bar -->
+    <HBox alignment="CENTER" spacing="20.0"
+          style="-fx-background-color: #141721; -fx-padding: 20;">
+        <Label fx:id="bottomTotalLabel" text="Total: $0.00" textFill="#ff6b35">
+            <font>
+                <Font name="System Bold" size="18.0" />
+            </font>
+        </Label>
+        <Region HBox.hgrow="ALWAYS" />
+        <Button fx:id="confirmButton" mnemonicParsing="false" onAction="#handleConfirmOrder"
+                prefHeight="45.0" prefWidth="180.0" text="Confirmar Compra"
+                style="-fx-background-color: #ff6b35; -fx-text-fill: #ffffff; -fx-background-radius: 8; -fx-font-weight: bold; -fx-font-size: 16px;" />
+    </HBox>
+</VBox>
