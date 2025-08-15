@@ -4,14 +4,16 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.image.*?>
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.policine.controllers.MovieListingController" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #1a1a2e;">
     <top>
-        <!-- Header Section -->
-        <VBox prefHeight="120.0" style="-fx-background-color: #16213e;">
+        <!-- Header Section with Logo -->
+        <VBox prefHeight="120.0" style="-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #16213e, #1a202c); -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 2);">
             <children>
-                <!-- Title and Search Bar -->
+                <!-- Title, Logo and Search Bar -->
                 <GridPane hgap="20.0" vgap="10.0">
                     <columnConstraints>
+                        <ColumnConstraints hgrow="NEVER" minWidth="50.0" prefWidth="60.0" />
                         <ColumnConstraints hgrow="NEVER" minWidth="100.0" prefWidth="120.0" />
                         <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
                         <ColumnConstraints hgrow="NEVER" minWidth="50.0" prefWidth="50.0" />
@@ -20,19 +22,34 @@
                         <RowConstraints minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <children>
-                        <Label text="Cinemax" textFill="#0ea5e9" GridPane.columnIndex="0" GridPane.halignment="LEFT" GridPane.valignment="CENTER">
+                        <!-- Logo -->
+                        <ImageView fx:id="logoImageView" fitHeight="40.0" fitWidth="40.0" preserveRatio="true"
+                                   GridPane.columnIndex="0" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                            <image>
+                                <Image url="@../../../images/logo.png" />
+                            </image>
+                        </ImageView>
+
+                        <!-- App Title -->
+                        <Label text="Cinemax" textFill="#0ea5e9" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.valignment="CENTER"
+                               style="-fx-effect: dropshadow(gaussian, rgba(14,165,233,0.4), 4, 0, 0, 0);">
                             <font>
                                 <Font name="System Bold" size="24.0" />
                             </font>
                         </Label>
-                        <TextField fx:id="searchField" onKeyReleased="#onSearchKeyReleased" prefHeight="35.0" promptText="Buscar películas, géneros, actores..." style="-fx-background-color: #2d3748; -fx-text-fill: white; -fx-prompt-text-fill: #a0aec0; -fx-background-radius: 5;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+
+                        <!-- Enhanced Search Field -->
+                        <TextField fx:id="searchField" onKeyReleased="#onSearchKeyReleased" prefHeight="38.0"
+                                   promptText="🔍 Buscar películas, géneros, actores..."
+                                   style="-fx-background-color: #2d3748; -fx-text-fill: white; -fx-prompt-text-fill: #a0aec0; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: transparent; -fx-border-width: 2; -fx-padding: 0 15 0 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 1);"
+                                   GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" />
                     </children>
                     <padding>
                         <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
                     </padding>
                 </GridPane>
 
-                <!-- Filter Controls -->
+                <!-- Enhanced Filter Controls -->
                 <GridPane hgap="15.0" vgap="10.0">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" percentWidth="20.0" />
@@ -45,10 +62,25 @@
                         <RowConstraints minHeight="45.0" prefHeight="45.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <children>
-                        <ComboBox fx:id="genreComboBox" maxWidth="1.7976931348623157E308" onAction="#onGenreFilterChanged" prefHeight="35.0" promptText="Género" style="-fx-background-color: #2d3748; -fx-text-fill: white;" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" />
-                        <ComboBox fx:id="scheduleComboBox" maxWidth="1.7976931348623157E308" onAction="#onScheduleFilterChanged" prefHeight="35.0" promptText="Horario" style="-fx-background-color: #2d3748; -fx-text-fill: white;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-                        <ComboBox fx:id="roomComboBox" maxWidth="1.7976931348623157E308" onAction="#onRoomFilterChanged" prefHeight="35.0" promptText="Sala" style="-fx-background-color: #2d3748; -fx-text-fill: white;" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" />
-                        <DatePicker fx:id="datePicker" maxWidth="1.7976931348623157E308" onAction="#onDateChanged" prefHeight="35.0" promptText="Fecha" style="-fx-background-color: #2d3748; -fx-text-fill: white;" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS" />
+                        <ComboBox fx:id="genreComboBox" maxWidth="1.7976931348623157E308" onAction="#onGenreFilterChanged"
+                                  prefHeight="38.0" promptText="🎭 Género"
+                                  style="-fx-background-color: #2d3748; -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 1);"
+                                  GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" />
+
+                        <ComboBox fx:id="scheduleComboBox" maxWidth="1.7976931348623157E308" onAction="#onScheduleFilterChanged"
+                                  prefHeight="38.0" promptText="🕐 Horario"
+                                  style="-fx-background-color: #2d3748; -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 1);"
+                                  GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+
+                        <ComboBox fx:id="roomComboBox" maxWidth="1.7976931348623157E308" onAction="#onRoomFilterChanged"
+                                  prefHeight="38.0" promptText="🏛️ Sala"
+                                  style="-fx-background-color: #2d3748; -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 1);"
+                                  GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" />
+
+                        <DatePicker fx:id="datePicker" maxWidth="1.7976931348623157E308" onAction="#onDateChanged"
+                                    prefHeight="38.0" promptText="📅 Fecha"
+                                    style="-fx-background-color: #2d3748; -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 1);"
+                                    GridPane.columnIndex="3" GridPane.hgrow="ALWAYS" />
                     </children>
                     <padding>
                         <Insets bottom="15.0" left="20.0" right="20.0" />
@@ -57,16 +89,18 @@
             </children>
         </VBox>
     </top>
+
     <center>
         <!-- Main Content Area -->
         <BorderPane>
             <center>
-                <!-- Movies Grid -->
-                <ScrollPane fx:id="moviesScrollPane" fitToWidth="true" style="-fx-background: #1a1a2e; -fx-background-color: #1a1a2e;">
+                <!-- Movies Grid with Enhanced Styling -->
+                <ScrollPane fx:id="moviesScrollPane" fitToWidth="true"
+                            style="-fx-background: #1a1a2e; -fx-background-color: #1a1a2e; -fx-border-width: 0;">
                     <content>
-                        <FlowPane fx:id="moviesFlowPane" alignment="TOP_LEFT" hgap="20.0" prefWrapLength="200.0" vgap="20.0">
+                        <FlowPane fx:id="moviesFlowPane" alignment="TOP_LEFT" hgap="25.0" prefWrapLength="200.0" vgap="25.0">
                             <padding>
-                                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
                             </padding>
                         </FlowPane>
                     </content>
@@ -75,14 +109,20 @@
                     </BorderPane.margin>
                 </ScrollPane>
             </center>
+
             <right>
-                <!-- Showtimes Panel (Initially Hidden) -->
-                <VBox fx:id="showtimesPanel" maxWidth="450.0" minWidth="350.0" prefWidth="400.0" style="-fx-background-color: #2d3748;" visible="false">
+                <!-- Enhanced Showtimes Panel -->
+                <VBox fx:id="showtimesPanel" maxWidth="450.0" minWidth="350.0" prefWidth="400.0"
+                      style="-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #2d3748, #1a202c); -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 12, 0, -3, 0);"
+                      visible="false">
                     <children>
-                        <!-- Panel Header -->
-                        <BorderPane prefHeight="60.0" style="-fx-background-color: #1a202c;">
+                        <!-- Enhanced Panel Header -->
+                        <BorderPane prefHeight="65.0" style="-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1a202c, #16213e); -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0, 0, 2);">
                             <left>
-                                <Label fx:id="selectedMovieTitle" maxWidth="1.7976931348623157E308" text="Funciones de El Viaje del Héroe" textFill="white" wrapText="true" BorderPane.alignment="CENTER_LEFT">
+                                <Label fx:id="selectedMovieTitle" maxWidth="1.7976931348623157E308"
+                                       text="Funciones de El Viaje del Héroe" textFill="white" wrapText="true"
+                                       BorderPane.alignment="CENTER_LEFT"
+                                       style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 2, 0, 0, 1);">
                                     <font>
                                         <Font name="System Bold" size="16.0" />
                                     </font>
@@ -92,40 +132,63 @@
                                 </Label>
                             </left>
                             <right>
-                                <Button fx:id="closePanelButton" mnemonicParsing="false" onAction="#closeShowtimesPanel" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="×" BorderPane.alignment="CENTER">
+                                <Button fx:id="closePanelButton" mnemonicParsing="false" onAction="#closeShowtimesPanel"
+                                        prefHeight="32.0" prefWidth="32.0"
+                                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 16; -fx-border-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 1);"
+                                        text="×" BorderPane.alignment="CENTER">
                                     <BorderPane.margin>
-                                        <Insets right="10.0" />
+                                        <Insets right="15.0" />
                                     </BorderPane.margin>
                                 </Button>
                             </right>
                         </BorderPane>
 
-                        <!-- Date Selection -->
-                        <VBox spacing="15.0">
+                        <!-- Enhanced Date Selection -->
+                        <VBox spacing="18.0">
                             <children>
-                                <Label text="Selecciona un día" textFill="white">
+                                <Label text="📅 Selecciona un día" textFill="white"
+                                       style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0, 0, 1);">
                                     <font>
-                                        <Font size="14.0" />
+                                        <Font name="System Bold" size="14.0" />
                                     </font>
                                 </Label>
 
-                                <!-- First row of date buttons -->
-                                <GridPane hgap="8.0" vgap="8.0">
+                                <!-- Enhanced Date Buttons Grid -->
+                                <GridPane hgap="10.0" vgap="10.0">
                                     <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.33" />
                                         <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.33" />
                                         <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.34" />
                                     </columnConstraints>
                                     <rowConstraints>
-                                        <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="38.0" prefHeight="38.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="38.0" prefHeight="38.0" vgrow="SOMETIMES" />
                                     </rowConstraints>
                                     <children>
-                                        <Button fx:id="todayButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#selectToday" prefHeight="35.0" style="-fx-background-color: #3182ce; -fx-text-fill: white; -fx-background-radius: 5;" text="Hoy" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" />
-                                        <Button fx:id="tomorrowButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#selectTomorrow" prefHeight="35.0" style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-background-radius: 5;" text="Mañana" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-                                        <Button fx:id="dayAfterButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#selectDayAfter" prefHeight="35.0" style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-background-radius: 5;" text="Vie, 24" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" />
-                                        <Button fx:id="saturdayButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#selectSaturday" prefHeight="35.0" style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-background-radius: 5;" text="Sáb, 25" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
-                                        <Button fx:id="sundayButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#selectSunday" prefHeight="35.0" style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-background-radius: 5;" text="Dom, 26" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+                                        <Button fx:id="todayButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                                onAction="#selectToday" prefHeight="38.0"
+                                                style="-fx-background-color: #3182ce; -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(49,130,206,0.4), 4, 0, 0, 2); -fx-font-weight: bold;"
+                                                text="Hoy" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" />
+
+                                        <Button fx:id="tomorrowButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                                onAction="#selectTomorrow" prefHeight="38.0"
+                                                style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 1);"
+                                                text="Mañana" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+
+                                        <Button fx:id="dayAfterButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                                onAction="#selectDayAfter" prefHeight="38.0"
+                                                style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 1);"
+                                                text="Vie, 24" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" />
+
+                                        <Button fx:id="saturdayButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                                onAction="#selectSaturday" prefHeight="38.0"
+                                                style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 1);"
+                                                text="Sáb, 25" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+
+                                        <Button fx:id="sundayButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                                onAction="#selectSunday" prefHeight="38.0"
+                                                style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 1);"
+                                                text="Dom, 26" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
                                     </children>
                                 </GridPane>
                             </children>
@@ -134,22 +197,26 @@
                             </padding>
                         </VBox>
 
-                        <!-- Available Showtimes -->
+                        <!-- Enhanced Available Showtimes -->
                         <VBox VBox.vgrow="ALWAYS">
                             <children>
-                                <Label text="Horarios disponibles" textFill="white">
+                                <Label text="🎬 Horarios disponibles" textFill="white"
+                                       style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0, 0, 1);">
                                     <font>
-                                        <Font size="14.0" />
+                                        <Font name="System Bold" size="14.0" />
                                     </font>
                                 </Label>
-                                <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+
+                                <ScrollPane fitToWidth="true"
+                                            style="-fx-background: transparent; -fx-background-color: transparent; -fx-border-width: 0;"
+                                            VBox.vgrow="ALWAYS">
                                     <content>
-                                        <VBox fx:id="showtimesContainer" spacing="8.0">
+                                        <VBox fx:id="showtimesContainer" spacing="10.0">
                                             <!-- Showtime items will be added programmatically -->
                                         </VBox>
                                     </content>
                                     <VBox.margin>
-                                        <Insets top="10.0" />
+                                        <Insets top="12.0" />
                                     </VBox.margin>
                                 </ScrollPane>
                             </children>
@@ -158,13 +225,16 @@
                             </padding>
                         </VBox>
 
-                        <!-- Book Seats Button -->
+                        <!-- Enhanced Book Seats Button -->
                         <VBox>
                             <children>
-                                <Button fx:id="bookSeatsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#bookSeats" prefHeight="45.0" style="-fx-background-color: #ed8936; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-size: 16px; -fx-font-weight: bold;" text="Seleccionar Asientos" />
+                                <Button fx:id="bookSeatsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                        onAction="#bookSeats" prefHeight="48.0"
+                                        style="-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #ed8936, #dd6b20); -fx-text-fill: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(237,137,54,0.4), 6, 0, 0, 3);"
+                                        text="🎫 Seleccionar Asientos" />
                             </children>
                             <padding>
-                                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                <Insets bottom="25.0" left="20.0" right="20.0" top="20.0" />
                             </padding>
                         </VBox>
                     </children>
