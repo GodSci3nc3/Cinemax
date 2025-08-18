@@ -394,7 +394,7 @@ public class MovieListingController implements Initializable {
         // Try to load image, use placeholder if not found
         ImageView poster = new ImageView();
         try {
-            String imagePath = "/images/" + pelicula.getTitulo().toLowerCase().replaceAll("[^a-zA-Z0-9]", "") + ".jpg";
+            String imagePath = "@../../../images/" + pelicula.getTitulo().toLowerCase().replaceAll("[^a-zA-Z0-9]", "") + ".jpg";
             Image image = new Image(getClass().getResourceAsStream(imagePath));
             poster.setImage(image);
             poster.setFitWidth(194);

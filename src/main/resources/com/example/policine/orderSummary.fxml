@@ -22,6 +22,12 @@
                 <Font name="System Bold" size="20.0" />
             </font>
         </Label>
+        <Region HBox.hgrow="ALWAYS" />
+        <Label fx:id="timerLabel" text="Tiempo restante: 10:00" textFill="#8b9dc3">
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Label>
     </HBox>
 
     <!-- Content -->
@@ -68,59 +74,51 @@
                     </VBox>
                 </VBox>
 
-                <!-- Detalles de Pago -->
+                <!-- Información de Pago en Efectivo -->
                 <VBox spacing="15.0" style="-fx-background-color: #252b3d; -fx-background-radius: 12; -fx-padding: 20;">
-                    <Label text="Detalles de Pago" textFill="#ffffff">
+                    <Label text="💰 Pago en Efectivo" textFill="#ffffff">
                         <font>
                             <Font name="System Bold" size="18.0" />
                         </font>
                     </Label>
 
-                    <VBox spacing="12.0">
-                        <!-- Número de Tarjeta -->
-                        <VBox spacing="5.0">
-                            <Label text="Número de Tarjeta" textFill="#8b9dc3">
-                                <font>
-                                    <Font size="14.0" />
-                                </font>
-                            </Label>
-                            <TextField fx:id="cardNumberField" promptText="XXXX XXXX XXXX XXXX"
-                                       style="-fx-background-color: #3a4258; -fx-text-fill: #ffffff; -fx-prompt-text-fill: #6c7b8a; -fx-background-radius: 8; -fx-border-color: transparent; -fx-padding: 12;" />
-                        </VBox>
-
-                        <!-- Fecha de Vencimiento y CVC -->
-                        <HBox spacing="10.0">
-                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                <Label text="Fecha de Vencimiento" textFill="#8b9dc3">
-                                    <font>
-                                        <Font size="14.0" />
-                                    </font>
-                                </Label>
-                                <TextField fx:id="expiryField" promptText="MM/AA"
-                                           style="-fx-background-color: #3a4258; -fx-text-fill: #ffffff; -fx-prompt-text-fill: #6c7b8a; -fx-background-radius: 8; -fx-border-color: transparent; -fx-padding: 12;" />
-                            </VBox>
-                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                <Label text="CVC" textFill="#8b9dc3">
-                                    <font>
-                                        <Font size="14.0" />
-                                    </font>
-                                </Label>
-                                <TextField fx:id="cvcField" promptText="XXX"
-                                           style="-fx-background-color: #3a4258; -fx-text-fill: #ffffff; -fx-prompt-text-fill: #6c7b8a; -fx-background-radius: 8; -fx-border-color: transparent; -fx-padding: 12;" />
-                            </VBox>
-                        </HBox>
-
-                        <!-- Nombre en la Tarjeta -->
-                        <VBox spacing="5.0">
-                            <Label text="Nombre en la Tarjeta" textFill="#8b9dc3">
-                                <font>
-                                    <Font size="14.0" />
-                                </font>
-                            </Label>
-                            <TextField fx:id="cardHolderField" promptText="Nombre Completo"
-                                       style="-fx-background-color: #3a4258; -fx-text-fill: #ffffff; -fx-prompt-text-fill: #6c7b8a; -fx-background-radius: 8; -fx-border-color: transparent; -fx-padding: 12;" />
-                        </VBox>
+                    <VBox spacing="10.0">
+                        <Label text="• El pago se realizará en taquilla antes del inicio de la función" textFill="#8b9dc3" wrapText="true">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                        <Label text="• Por favor, llega con al menos 30 minutos de anticipación" textFill="#8b9dc3" wrapText="true">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                        <Label text="• Trae efectivo exacto para facilitar el proceso" textFill="#8b9dc3" wrapText="true">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                        <Label text="• Tu reserva se mantendrá activa hasta 15 minutos antes de la función" textFill="#8b9dc3" wrapText="true">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
                     </VBox>
+
+                    <!-- Monto a pagar destacado -->
+                    <HBox alignment="CENTER" spacing="10.0" style="-fx-background-color: #3a4258; -fx-background-radius: 8; -fx-padding: 15;">
+                        <Label text="Monto a pagar en taquilla:" textFill="#ffffff">
+                            <font>
+                                <Font name="System Bold" size="16.0" />
+                            </font>
+                        </Label>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="cashAmountLabel" textFill="#ff6b35">
+                            <font>
+                                <Font name="System Bold" size="20.0" />
+                            </font>
+                        </Label>
+                    </HBox>
                 </VBox>
             </VBox>
         </content>
@@ -136,7 +134,7 @@
         </Label>
         <Region HBox.hgrow="ALWAYS" />
         <Button fx:id="confirmButton" mnemonicParsing="false" onAction="#handleConfirmOrder"
-                prefHeight="45.0" prefWidth="180.0" text="Confirmar Compra"
+                prefHeight="45.0" prefWidth="200.0" text="Confirmar Reserva"
                 style="-fx-background-color: #ff6b35; -fx-text-fill: #ffffff; -fx-background-radius: 8; -fx-font-weight: bold; -fx-font-size: 16px;" />
     </HBox>
 </VBox>

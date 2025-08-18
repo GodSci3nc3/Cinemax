@@ -22,7 +22,6 @@ import java.util.ResourceBundle;
 
 public class SplashController implements Initializable {
 
-    // Solo los elementos que REALMENTE existen en el FXML
     @FXML private ImageView logoImage;
     @FXML private Label titleLabel;
     @FXML private Label loadingLabel;
@@ -47,9 +46,7 @@ public class SplashController implements Initializable {
     }
 
     private void startAnimations() {
-        // Verificar que los elementos existen antes de animar
         if (logoImage != null) {
-            // Logo rotation con smooth easing
             RotateTransition logoRotation = new RotateTransition(Duration.seconds(3), logoImage);
             logoRotation.setFromAngle(0);
             logoRotation.setToAngle(360);
@@ -59,7 +56,6 @@ public class SplashController implements Initializable {
         }
 
         if (titleLabel != null) {
-            // Title animation con scale y fade
             FadeTransition titleFade = new FadeTransition(Duration.seconds(2), titleLabel);
             titleFade.setFromValue(0);
             titleFade.setToValue(1);
@@ -71,7 +67,6 @@ public class SplashController implements Initializable {
             titleScale.setToY(1.0);
             titleScale.setInterpolator(Interpolator.EASE_OUT);
 
-            // Bounce effect para el título
             TranslateTransition titleBounce = new TranslateTransition(Duration.seconds(2), titleLabel);
             titleBounce.setFromY(-20);
             titleBounce.setToY(0);
@@ -82,7 +77,6 @@ public class SplashController implements Initializable {
         }
 
         if (loadingLabel != null) {
-            // Loading text pulsing animation
             FadeTransition loadingPulse = new FadeTransition(Duration.seconds(1.8), loadingLabel);
             loadingPulse.setFromValue(0.7);
             loadingPulse.setToValue(1.0);

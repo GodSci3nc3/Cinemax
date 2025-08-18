@@ -255,26 +255,162 @@ public class FuncionDAO {
     }
 
     /**
-     * Verificar disponibilidad de sala para una función
+     * Listar funciones disponibles por película (que no estén llenas)
      */
-    public boolean verificarDisponibilidadSala(int idSala, LocalDate fecha, LocalTime hora) {
-        String sql = "SELECT COUNT(*) as total FROM Funcion WHERE Sala_ID_Sala = ? AND Fecha = ? AND Hora = ?";  // CAMBIADO AQUÍ
+    public List<FuncionConDisponibilidad> listarDisponiblesPorPelicula(int idPelicula) {
+        List<FuncionConDisponibilidad> funciones = new ArrayList<>();
+        String sql = """
+            SELECT f.*, s.Capacidad,
+                   COALESCE(ocupados.total_ocupados, 0) as asientos_ocupados,
+                   (s.Capacidad - COALESCE(ocupados.total_ocupados, 0)) as asientos_disponibles,
+                   CASE 
+                       WHEN COALESCE(ocupados.total_ocupados, 0) >= s.Capacidad THEN 1 
+                       ELSE 0 
+                   END as esta_llena
+            FROM Funcion f
+            INNER JOIN Sala s ON f.Sala_ID_Sala = s.ID_Sala
+            LEFT JOIN (
+                SELECT r.Funcion_ID_Funcion, COUNT(*) as total_ocupados
+                FROM Reserva r
+                INNER JOIN Reserva_Asiento ra ON r.ID_Reserva = ra.Reserva_ID_Reserva
+                WHERE r.Estado IN ('Confirmada', 'Pendiente')
+                GROUP BY r.Funcion_ID_Funcion
+            ) ocupados ON f.ID_Funcion = ocupados.Funcion_ID_Funcion
+            WHERE f.Pelicula_ID_Pelicula = ?
+            ORDER BY f.Fecha, f.Hora
+            """;
 
         try (Connection conn = BDConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, idSala);
-            pstmt.setDate(2, Date.valueOf(fecha));
-            pstmt.setTime(3, Time.valueOf(hora));
-
+            pstmt.setInt(1, idPelicula);
             ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("total") == 0;
+
+            while (rs.next()) {
+                Funcion funcion = new Funcion(
+                        rs.getInt("ID_Funcion"),
+                        rs.getDate("Fecha").toLocalDate(),
+                        rs.getTime("Hora").toLocalTime(),
+                        rs.getInt("Pelicula_ID_Pelicula"),
+                        rs.getInt("Sala_ID_Sala")
+                );
+
+                FuncionConDisponibilidad funcionConDisp = new FuncionConDisponibilidad(
+                        funcion,
+                        rs.getInt("Capacidad"),
+                        rs.getInt("asientos_ocupados"),
+                        rs.getInt("asientos_disponibles"),
+                        rs.getBoolean("esta_llena")
+                );
+
+                funciones.add(funcionConDisp);
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al verificar disponibilidad: " + e.getMessage());
+            System.err.println("Error al listar funciones disponibles por película: " + e.getMessage());
         }
-        return false;
+        return funciones;
     }
+
+    /**
+     * Listar solo funciones que tengan asientos disponibles
+     */
+    public List<Funcion> listarSoloConDisponibilidad(int idPelicula) {
+        List<Funcion> funciones = new ArrayList<>();
+        String sql = """
+            SELECT f.*
+            FROM Funcion f
+            INNER JOIN Sala s ON f.Sala_ID_Sala = s.ID_Sala
+            LEFT JOIN (
+                SELECT r.Funcion_ID_Funcion, COUNT(*) as total_ocupados
+                FROM Reserva r
+                INNER JOIN Reserva_Asiento ra ON r.ID_Reserva = ra.Reserva_ID_Reserva
+                WHERE r.Estado IN ('Confirmada', 'Pendiente')
+                GROUP BY r.Funcion_ID_Funcion
+            ) ocupados ON f.ID_Funcion = ocupados.Funcion_ID_Funcion
+            WHERE f.Pelicula_ID_Pelicula = ?
+            AND COALESCE(ocupados.total_ocupados, 0) < s.Capacidad
+            ORDER BY f.Fecha, f.Hora
+            """;
+
+        try (Connection conn = BDConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, idPelicula);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                funciones.add(new Funcion(
+                        rs.getInt("ID_Funcion"),
+                        rs.getDate("Fecha").toLocalDate(),
+                        rs.getTime("Hora").toLocalTime(),
+                        rs.getInt("Pelicula_ID_Pelicula"),
+                        rs.getInt("Sala_ID_Sala")
+                ));
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al listar funciones con disponibilidad: " + e.getMessage());
+        }
+        return funciones;
+    }
+
+    public static class FuncionConDisponibilidad {
+        private final Funcion funcion;
+        private final int capacidadTotal;
+        private final int asientosOcupados;
+        private final int asientosDisponibles;
+        private final boolean estaLlena;
+
+        public FuncionConDisponibilidad(Funcion funcion, int capacidadTotal, int asientosOcupados, int asientosDisponibles, boolean estaLlena) {
+            this.funcion = funcion;
+            this.capacidadTotal = capacidadTotal;
+            this.asientosOcupados = asientosOcupados;
+            this.asientosDisponibles = asientosDisponibles;
+            this.estaLlena = estaLlena;
+        }
+
+        // Getters
+        public Funcion getFuncion() {
+            return funcion;
+        }
+
+        public int getCapacidadTotal() {
+            return capacidadTotal;
+        }
+
+        public int getAsientosOcupados() {
+            return asientosOcupados;
+        }
+
+        public int getAsientosDisponibles() {
+            return asientosDisponibles;
+        }
+
+        public boolean isEstaLlena() {
+            return estaLlena;
+        }
+
+        // Método adicional para obtener el porcentaje de ocupación
+        public double getPorcentajeOcupacion() {
+            if (capacidadTotal == 0) {
+                return 0.0;
+            }
+            return (double) asientosOcupados / capacidadTotal * 100.0;
+        }
+
+        // Método toString para facilitar debugging y logging
+        @Override
+        public String toString() {
+            return "FuncionConDisponibilidad{" +
+                    "funcion=" + funcion +
+                    ", capacidadTotal=" + capacidadTotal +
+                    ", asientosOcupados=" + asientosOcupados +
+                    ", asientosDisponibles=" + asientosDisponibles +
+                    ", estaLlena=" + estaLlena +
+                    ", porcentajeOcupacion=" + String.format("%.1f", getPorcentajeOcupacion()) + "%" +
+                    '}';
+        }
+    }
+
 }

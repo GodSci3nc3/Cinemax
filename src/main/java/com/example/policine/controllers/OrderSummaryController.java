@@ -4,6 +4,9 @@ import com.example.policine.model.session.BookingSession;
 import com.example.policine.model.entities.Pelicula;
 import com.example.policine.model.entities.Funcion;
 import com.example.policine.model.entities.Sala;
+import com.example.policine.services.BookingService;
+import com.example.policine.services.BookingService.ReservaCompleta;
+import com.example.policine.services.BookingService.ReservaException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,6 +29,8 @@ import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class OrderSummaryController implements Initializable {
 
@@ -36,25 +41,126 @@ public class OrderSummaryController implements Initializable {
     @FXML private RadioButton pickupRadio;
     @FXML private RadioButton deliveryRadio;
     @FXML private ToggleGroup deliveryGroup;
-    @FXML private TextField cardNumberField;
-    @FXML private TextField expiryField;
-    @FXML private TextField cvcField;
-    @FXML private TextField cardHolderField;
     @FXML private Button confirmButton;
+    @FXML private Label timerLabel;
+    @FXML private Label cashAmountLabel;
 
     // Session data
     private BookingSession session;
+    private BookingService bookingService;
+
+    // Timer para la sesión
+    private Timer sessionTimer;
+    private int remainingSeconds = 600; // 10 minutos = 600 segundos
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         session = BookingSession.getInstance();
+        bookingService = new BookingService();
         setupRadioButtons();
-        setupTextFieldValidations();
+        startSessionTimer();
     }
 
     public void initializeWithSessionData() {
         loadOrderSummary();
         updateTotalLabels();
+        // Verificar disponibilidad de asientos antes de mostrar
+        verificarDisponibilidadAsientos();
+    }
+
+    private void verificarDisponibilidadAsientos() {
+        if (session.getFuncion() == null || session.getAsientosSeleccionados().isEmpty()) {
+            return;
+        }
+
+        // Verificar en segundo plano para no bloquear UI
+        new Thread(() -> {
+            boolean disponibles = bookingService.verificarDisponibilidadAsientos(
+                    session.getFuncion().getIdFuncion(),
+                    session.getAsientosSeleccionados()
+            );
+
+            if (!disponibles) {
+                Platform.runLater(() -> {
+                    showAsientosNoDisponiblesAlert();
+                });
+            }
+        }).start();
+    }
+
+    private void showAsientosNoDisponiblesAlert() {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Asientos No Disponibles");
+        alert.setHeaderText("Algunos asientos ya no están disponibles");
+        alert.setContentText("Los asientos que seleccionaste han sido reservados por otro usuario. " +
+                "Debes seleccionar nuevos asientos.");
+
+        alert.setOnHidden(e -> {
+            try {
+                volverASeleccionAsientos();
+            } catch (IOException ex) {
+                System.err.println("Error al volver a selección de asientos: " + ex.getMessage());
+            }
+        });
+
+        alert.showAndWait();
+    }
+
+    private void startSessionTimer() {
+        sessionTimer = new Timer();
+        sessionTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    remainingSeconds--;
+                    updateTimerDisplay();
+
+                    if (remainingSeconds <= 0) {
+                        sessionExpired();
+                    }
+                });
+            }
+        }, 1000, 1000);
+    }
+
+    private void updateTimerDisplay() {
+        int minutes = remainingSeconds / 60;
+        int seconds = remainingSeconds % 60;
+        String timeText = String.format("Tiempo restante: %02d:%02d", minutes, seconds);
+        timerLabel.setText(timeText);
+
+        // Cambiar color cuando quede poco tiempo
+        if (remainingSeconds <= 120) { // 2 minutos
+            timerLabel.setTextFill(Color.web("#ff6b35"));
+        } else if (remainingSeconds <= 300) { // 5 minutos
+            timerLabel.setTextFill(Color.web("#ffcc00"));
+        } else {
+            timerLabel.setTextFill(Color.web("#8b9dc3"));
+        }
+    }
+
+    private void sessionExpired() {
+        if (sessionTimer != null) {
+            sessionTimer.cancel();
+        }
+
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Sesión Expirada");
+            alert.setHeaderText("Tiempo agotado");
+            alert.setContentText("Tu sesión ha expirado por inactividad. Debes reiniciar el proceso de compra.");
+
+            alert.setOnHidden(e -> {
+                session.reset();
+                try {
+                    returnToMovieListing();
+                } catch (IOException ex) {
+                    System.err.println("Error al volver a movie listing: " + ex.getMessage());
+                }
+            });
+
+            alert.showAndWait();
+        });
     }
 
     private void loadOrderSummary() {
@@ -248,83 +354,19 @@ public class OrderSummaryController implements Initializable {
         });
     }
 
-    private void setupTextFieldValidations() {
-        // Validación para el número de tarjeta
-        cardNumberField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("[\\d\\s]*")) {
-                cardNumberField.setText(newValue.replaceAll("[^\\d\\s]", ""));
-            }
-            if (newValue.length() <= 19) {
-                String formatted = formatCardNumber(newValue.replaceAll("\\s", ""));
-                if (!formatted.equals(newValue)) {
-                    Platform.runLater(() -> {
-                        cardNumberField.setText(formatted);
-                        cardNumberField.positionCaret(formatted.length());
-                    });
-                }
-            }
-        });
-
-        // Validación para fecha de vencimiento
-        expiryField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("[\\d/]*")) {
-                expiryField.setText(newValue.replaceAll("[^\\d/]", ""));
-            }
-            if (newValue.length() <= 5) {
-                String formatted = formatExpiryDate(newValue.replaceAll("/", ""));
-                if (!formatted.equals(newValue)) {
-                    Platform.runLater(() -> {
-                        expiryField.setText(formatted);
-                        expiryField.positionCaret(formatted.length());
-                    });
-                }
-            }
-        });
-
-        // Validación para CVC
-        cvcField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*")) {
-                cvcField.setText(newValue.replaceAll("[^\\d]", ""));
-            }
-            if (newValue.length() > 3) {
-                cvcField.setText(newValue.substring(0, 3));
-            }
-        });
-
-        // Validación para nombre
-        cardHolderField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("[a-zA-Z\\s]*")) {
-                cardHolderField.setText(newValue.replaceAll("[^a-zA-Z\\s]", ""));
-            }
-        });
-    }
-
-    private String formatCardNumber(String cardNumber) {
-        StringBuilder formatted = new StringBuilder();
-        for (int i = 0; i < cardNumber.length(); i++) {
-            if (i > 0 && i % 4 == 0) {
-                formatted.append(" ");
-            }
-            formatted.append(cardNumber.charAt(i));
-        }
-        return formatted.toString();
-    }
-
-    private String formatExpiryDate(String expiry) {
-        if (expiry.length() >= 2) {
-            return expiry.substring(0, 2) + "/" + expiry.substring(2);
-        }
-        return expiry;
-    }
-
     private void updateTotalLabels() {
         String totalText = String.format("$%.2f", session.getTotal());
         totalLabel.setText(totalText);
         bottomTotalLabel.setText("Total: " + totalText);
+        cashAmountLabel.setText(totalText);
     }
 
     @FXML
     private void handleBack(ActionEvent event) {
+        if (sessionTimer != null) {
+            sessionTimer.cancel();
+        }
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/policine/foodSelection.fxml"));
             Parent foodSelectionRoot = loader.load();
@@ -345,29 +387,28 @@ public class OrderSummaryController implements Initializable {
         }
     }
 
-    @FXML
-    private void handleConfirmOrder(ActionEvent event) {
-        if (validateFields()) {
-            processOrder();
-        } else {
-            showValidationAlert();
+    private void volverASeleccionAsientos() throws IOException {
+        if (sessionTimer != null) {
+            sessionTimer.cancel();
         }
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/policine/seatSelection.fxml"));
+        Parent seatSelectionRoot = loader.load();
+
+        // Reinicializar controlador de selección de asientos
+        SeatSelectionController controller = loader.getController();
+        controller.initializeWithSessionData();
+
+        Stage stage = (Stage) confirmButton.getScene().getWindow();
+        Scene seatSelectionScene = new Scene(seatSelectionRoot);
+        stage.setScene(seatSelectionScene);
+        stage.setTitle("Cinemax - Selección de Asientos");
+        stage.centerOnScreen();
     }
 
-    private boolean validateFields() {
-        String cardNumber = cardNumberField.getText().replaceAll("\\s", "");
-        if (cardNumber.length() != 16) return false;
-
-        String expiry = expiryField.getText();
-        if (!expiry.matches("\\d{2}/\\d{2}")) return false;
-
-        String cvc = cvcField.getText();
-        if (cvc.length() != 3) return false;
-
-        String cardHolder = cardHolderField.getText().trim();
-        if (cardHolder.isEmpty()) return false;
-
-        return true;
+    @FXML
+    private void handleConfirmOrder(ActionEvent event) {
+        processOrder();
     }
 
     private void processOrder() {
@@ -377,29 +418,83 @@ public class OrderSummaryController implements Initializable {
         confirmButton.setDisable(true);
         confirmButton.setText("Procesando...");
 
-        // Simular procesamiento
+        // Detener el timer
+        if (sessionTimer != null) {
+            sessionTimer.cancel();
+        }
+
+        // Procesar en hilo separado
         new Thread(() -> {
             try {
-                Thread.sleep(2000);
-                Platform.runLater(this::showSuccessAlert);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.sleep(1000); // Simular procesamiento
+
+                // Usar el servicio mejorado para guardar la reserva
+                ReservaCompleta reservaCompleta = bookingService.procesarReserva(session);
+
+                Platform.runLater(() -> {
+                    showSuccessAlert(reservaCompleta);
+                });
+
+            } catch (ReservaException e) {
+                Platform.runLater(() -> {
+                    showReservaErrorAlert(e.getMessage());
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    showErrorAlert();
+                });
             }
         }).start();
     }
 
-    private void showValidationAlert() {
-        showAlert("Campos incompletos",
-                "Por favor completa todos los campos de pago correctamente.",
-                Alert.AlertType.WARNING);
+    private void showReservaErrorAlert(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Error en la Reserva");
+        alert.setHeaderText("No se pudo completar la reserva");
+        alert.setContentText(mensaje + "\n\nPor favor, intenta nuevamente.");
+
+        alert.setOnHidden(e -> {
+            confirmButton.setDisable(false);
+            confirmButton.setText("Confirmar Compra");
+            startSessionTimer(); // Reiniciar timer
+        });
+
+        alert.showAndWait();
     }
 
-    private void showSuccessAlert() {
+    private void showErrorAlert() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error en la Compra");
+        alert.setHeaderText("No se pudo procesar tu reserva");
+        alert.setContentText("Ha ocurrido un error técnico. Por favor, intenta nuevamente.");
+
+        alert.setOnHidden(e -> {
+            confirmButton.setDisable(false);
+            confirmButton.setText("Confirmar Compra");
+            startSessionTimer(); // Reiniciar timer
+        });
+
+        alert.showAndWait();
+    }
+
+    private void showSuccessAlert(ReservaCompleta reservaCompleta) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("¡Compra Confirmada!");
+        alert.setTitle("¡Reserva Confirmada!");
         alert.setHeaderText("Tu reserva ha sido procesada exitosamente");
-        alert.setContentText("Recibirás un email con los detalles de tu compra y el código QR para el cine.\n\n" +
-                "Total pagado: $" + String.format("%.2f", session.getTotal()));
+
+        String mensaje = String.format(
+                "Número de Reserva: #%d\n" +
+                        "Asientos: %s\n" +
+                        "Total: $%.2f\n\n" +
+                        "Deberás realizar el pago en taquilla antes del inicio de la función.\n" +
+                        "Por favor, llega con al menos 30 minutos de anticipación.\n\n" +
+                        "Recuerda llevar efectivo exacto para facilitar el proceso.",
+                reservaCompleta.getReserva().getIdReserva(),
+                String.join(", ", reservaCompleta.getCodigosAsientos()),
+                reservaCompleta.getTotal()
+        );
+
+        alert.setContentText(mensaje);
 
         alert.setOnHidden(e -> {
             // Limpiar sesión y volver al inicio
@@ -412,9 +507,6 @@ public class OrderSummaryController implements Initializable {
         });
 
         alert.showAndWait();
-
-        confirmButton.setDisable(false);
-        confirmButton.setText("Confirmar Compra");
     }
 
     private void returnToMovieListing() throws IOException {

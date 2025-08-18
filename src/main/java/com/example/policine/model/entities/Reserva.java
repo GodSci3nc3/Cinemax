@@ -1,32 +1,32 @@
 package com.example.policine.model.entities;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Reserva {
     private int idReserva;
-    private LocalDate fechaReserva;
+    private LocalDateTime fechaReserva; // datetime en la BD
     private String estado;
-    private int idUsuario;
-    private int idFuncion;
+    private int usuarioIdUsuario; // Usuario_ID_Usuario en la BD
+    private int funcionIdFuncion; // Funcion_ID_Funcion en la BD
 
     // Constructor vacío
     public Reserva() {}
 
     // Constructor completo
-    public Reserva(int idReserva, LocalDate fechaReserva, String estado, int idUsuario, int idFuncion) {
+    public Reserva(int idReserva, LocalDateTime fechaReserva, String estado, int usuarioIdUsuario, int funcionIdFuncion) {
         this.idReserva = idReserva;
         this.fechaReserva = fechaReserva;
         this.estado = estado;
-        this.idUsuario = idUsuario;
-        this.idFuncion = idFuncion;
+        this.usuarioIdUsuario = usuarioIdUsuario;
+        this.funcionIdFuncion = funcionIdFuncion;
     }
 
     // Constructor sin ID (para insertar)
-    public Reserva(LocalDate fechaReserva, String estado, int idUsuario, int idFuncion) {
+    public Reserva(LocalDateTime fechaReserva, String estado, int usuarioIdUsuario, int funcionIdFuncion) {
         this.fechaReserva = fechaReserva;
         this.estado = estado;
-        this.idUsuario = idUsuario;
-        this.idFuncion = idFuncion;
+        this.usuarioIdUsuario = usuarioIdUsuario;
+        this.funcionIdFuncion = funcionIdFuncion;
     }
 
     // Getters y Setters
@@ -38,11 +38,11 @@ public class Reserva {
         this.idReserva = idReserva;
     }
 
-    public LocalDate getFechaReserva() {
+    public LocalDateTime getFechaReserva() {
         return fechaReserva;
     }
 
-    public void setFechaReserva(LocalDate fechaReserva) {
+    public void setFechaReserva(LocalDateTime fechaReserva) {
         this.fechaReserva = fechaReserva;
     }
 
@@ -54,20 +54,20 @@ public class Reserva {
         this.estado = estado;
     }
 
-    public int getIdUsuario() {
-        return idUsuario;
+    public int getUsuarioIdUsuario() {
+        return usuarioIdUsuario;
     }
 
-    public void setIdUsuario(int idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setUsuarioIdUsuario(int usuarioIdUsuario) {
+        this.usuarioIdUsuario = usuarioIdUsuario;
     }
 
-    public int getIdFuncion() {
-        return idFuncion;
+    public int getFuncionIdFuncion() {
+        return funcionIdFuncion;
     }
 
-    public void setIdFuncion(int idFuncion) {
-        this.idFuncion = idFuncion;
+    public void setFuncionIdFuncion(int funcionIdFuncion) {
+        this.funcionIdFuncion = funcionIdFuncion;
     }
 
     @Override
@@ -76,8 +76,8 @@ public class Reserva {
                 "idReserva=" + idReserva +
                 ", fechaReserva=" + fechaReserva +
                 ", estado='" + estado + '\'' +
-                ", idUsuario=" + idUsuario +
-                ", idFuncion=" + idFuncion +
+                ", usuarioIdUsuario=" + usuarioIdUsuario +
+                ", funcionIdFuncion=" + funcionIdFuncion +
                 '}';
     }
 }

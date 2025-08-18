@@ -4,6 +4,7 @@ import com.example.policine.model.entities.Funcion;
 import com.example.policine.model.entities.Pelicula;
 import com.example.policine.model.entities.Sala;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -38,6 +39,10 @@ public class BookingSession {
     // Datos de entrega
     private boolean entregarEnAsiento = false;
 
+    // Datos de sesión
+    private LocalDateTime inicioSesion;
+    private int idUsuario = 1; // Por defecto, deberías obtenerlo de la sesión de usuario
+
     private BookingSession() {
         reset();
     }
@@ -63,6 +68,7 @@ public class BookingSession {
         descuento = 0.0;
         total = 0.0;
         entregarEnAsiento = false;
+        inicioSesion = LocalDateTime.now();
     }
 
     // Métodos para película y función
@@ -70,6 +76,9 @@ public class BookingSession {
         this.pelicula = pelicula;
         this.funcion = funcion;
         this.sala = sala;
+        if (inicioSesion == null) {
+            inicioSesion = LocalDateTime.now();
+        }
     }
 
     // Métodos para asientos
@@ -116,6 +125,20 @@ public class BookingSession {
         total = subtotalGeneral + impuestos - descuento;
     }
 
+    // Métodos para verificar tiempo de sesión
+    public boolean isSessionExpired() {
+        if (inicioSesion == null) return true;
+        return LocalDateTime.now().isAfter(inicioSesion.plusMinutes(10));
+    }
+
+    public long getSecondsUntilExpiration() {
+        if (inicioSesion == null) return 0;
+        LocalDateTime expiration = inicioSesion.plusMinutes(10);
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isAfter(expiration)) return 0;
+        return java.time.Duration.between(now, expiration).getSeconds();
+    }
+
     // Getters
     public Pelicula getPelicula() { return pelicula; }
     public Funcion getFuncion() { return funcion; }
@@ -135,6 +158,10 @@ public class BookingSession {
     public boolean isEntregarEnAsiento() { return entregarEnAsiento; }
     public void setEntregarEnAsiento(boolean entregarEnAsiento) { this.entregarEnAsiento = entregarEnAsiento; }
 
+    public LocalDateTime getInicioSesion() { return inicioSesion; }
+    public int getIdUsuario() { return idUsuario; }
+    public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
+
     // Método para obtener resumen completo
     public String getResumenCompleto() {
         StringBuilder resumen = new StringBuilder();
@@ -144,6 +171,7 @@ public class BookingSession {
         }
         if (funcion != null && sala != null) {
             resumen.append("Función: ").append(funcion.getHora()).append(" - ").append(sala.getNombreSala()).append("\n");
+            resumen.append("Fecha: ").append(funcion.getFecha()).append("\n");
         }
 
         if (!asientosSeleccionados.isEmpty()) {
@@ -157,6 +185,7 @@ public class BookingSession {
             }
         }
 
+        resumen.append("Entrega: ").append(entregarEnAsiento ? "En asiento" : "En taquilla").append("\n");
         resumen.append(String.format("Subtotal: $%.2f\n", getSubtotalGeneral()));
         resumen.append(String.format("Impuestos: $%.2f\n", impuestos));
         if (descuento > 0) {
