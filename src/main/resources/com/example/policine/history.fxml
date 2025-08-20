@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.policine.controllers.HistorialReservasController"
+            prefHeight="800.0" prefWidth="1400.0"
+            style="-fx-background-color: #0f1629;">
+
+    <top>
+        <!-- Header Section -->
+        <VBox prefHeight="140.0" style="-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1a237e, #283593); -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0, 0, 3);">
+            <children>
+                <!-- Navigation and Title Bar -->
+                <HBox prefHeight="80.0" alignment="CENTER_LEFT" style="-fx-padding: 20;">
+                    <!-- Back Button -->
+                    <Button fx:id="backButton" mnemonicParsing="false"
+                            style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white; -fx-background-radius: 8; -fx-border-color: rgba(255,255,255,0.2); -fx-border-radius: 8; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 4, 0, 0, 2); -fx-cursor: hand;"
+                            text="← Regresar">
+                        <font>
+                            <Font size="14.0" />
+                        </font>
+                    </Button>
+
+                    <!-- Title -->
+                    <Region prefWidth="20.0" />
+                    <Label text="Historial de Reservas" textFill="white"
+                           style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 3, 0, 0, 1);">
+                        <font>
+                            <Font name="System Bold" size="32.0" />
+                        </font>
+                    </Label>
+
+                    <!-- Spacer -->
+                    <Region prefWidth="20.0" />
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <!-- Filter Controls -->
+                    <HBox spacing="15.0" alignment="CENTER_RIGHT">
+                        <Button text="🔍 Buscar..."
+                                style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: #b0bec5; -fx-background-radius: 20; -fx-border-color: rgba(255,255,255,0.2); -fx-border-radius: 20; -fx-cursor: hand;"
+                                prefWidth="120.0" prefHeight="35.0">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                        </Button>
+
+                        <Button text="📅 Últimos 90 días"
+                                style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: #b0bec5; -fx-background-radius: 20; -fx-border-color: rgba(255,255,255,0.2); -fx-border-radius: 20; -fx-cursor: hand;"
+                                prefWidth="140.0" prefHeight="35.0">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                        </Button>
+                    </HBox>
+                </HBox>
+
+                <!-- Subtitle -->
+                <Label text="Revisa tus reservaciones pasadas y futuras"
+                       textFill="#90a4ae"
+                       style="-fx-alignment: center; -fx-text-alignment: center;">
+                    <font>
+                        <Font size="16.0" />
+                    </font>
+                    <VBox.margin>
+                        <Insets bottom="20.0" left="20.0" />
+                    </VBox.margin>
+                </Label>
+            </children>
+        </VBox>
+    </top>
+
+    <center>
+        <HBox spacing="20.0" style="-fx-padding: 30;">
+            <!-- Left Side - Reservations List -->
+            <VBox spacing="20.0" prefWidth="850.0">
+                <!-- Reservations Content -->
+                <ScrollPane fx:id="scrollPane" fitToWidth="true"
+                            prefHeight="1200.0"
+                            style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+                    <VBox fx:id="mainContentArea" spacing="20.0"
+                          style="-fx-padding: 20; -fx-background-color: transparent;" />
+                </ScrollPane>
+
+                <!-- Empty State Container -->
+                <VBox fx:id="emptyStateContainer" spacing="30.0"
+                      style="-fx-alignment: center; -fx-padding: 50;"
+                      prefHeight="600.0"
+                      visible="false">
+                    <children>
+                        <Label text="🚧" style="-fx-font-size: 64px;" />
+
+                        <Label text="Sección en Desarrollo" textFill="white"
+                               style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 3, 0, 0, 1);">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                        </Label>
+
+                        <Label fx:id="emptyStateLabel"
+                               text="El historial de reservas estará disponible próximamente.&#10;Por ahora, puedes seguir realizando nuevas reservas."
+                               textFill="#90a4ae" wrapText="true" maxWidth="400.0"
+                               style="-fx-text-alignment: center; -fx-alignment: center;">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </Label>
+
+                        <!-- Action Buttons -->
+                        <HBox spacing="15.0" style="-fx-alignment: center; -fx-padding: 20 0 0 0;">
+                            <children>
+                                <Button fx:id="newReservationButton"
+                                        text="🎬 Nueva Reservación"
+                                        prefHeight="50.0" prefWidth="200.0"
+                                        style="-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #1565c0, #0d47a1); -fx-text-fill: white; -fx-background-radius: 12; -fx-border-radius: 12; -fx-font-size: 14px; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(21,101,192,0.4), 8, 0, 0, 4); -fx-cursor: hand;" />
+
+                                <Button fx:id="contactButton"
+                                        text="📞 Contactar Soporte"
+                                        prefHeight="50.0" prefWidth="200.0"
+                                        style="-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #00838f, #006064); -fx-text-fill: white; -fx-background-radius: 12; -fx-border-radius: 12; -fx-font-size: 14px; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,131,143,0.4), 8, 0, 0, 4); -fx-cursor: hand;" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </VBox>
+
+            <!-- Right Side - Summary Panel -->
+            <VBox spacing="20.0" prefWidth="320.0" style="-fx-padding: 0 0 0 20;">
+                <!-- Order Summary Card -->
+                <VBox spacing="20.0"
+                      style="-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e2a4a, #263050); -fx-background-radius: 15; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 3);">
+
+                    <Label text="Orden General" textFill="white"
+                           style="-fx-font-weight: bold;">
+                        <font>
+                            <Font size="18.0" />
+                        </font>
+                    </Label>
+
+                    <VBox spacing="12.0">
+                        <HBox>
+                            <Label text="Entradas" textFill="#90a4ae" prefWidth="150.0">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label text="68.50" textFill="white">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                        </HBox>
+
+                        <HBox>
+                            <Label text="Comida" textFill="#90a4ae" prefWidth="150.0">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label text="12.25" textFill="white">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                        </HBox>
+
+                        <HBox>
+                            <Label text="Tarifa Servicio" textFill="#90a4ae" prefWidth="150.0">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label text="3.50" textFill="white">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                        </HBox>
+
+                        <HBox>
+                            <Label text="Descuento" textFill="#90a4ae" prefWidth="150.0">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label text="-$5.00" textFill="#4caf50">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                        </HBox>
+
+                        <Separator style="-fx-background-color: rgba(255,255,255,0.2);" />
+
+                        <HBox>
+                            <Label text="Total" textFill="#2196f3" prefWidth="150.0"
+                                   style="-fx-font-weight: bold;">
+                                <font>
+                                    <Font size="16.0" />
+                                </font>
+                            </Label>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label text="79.25" textFill="#2196f3"
+                                   style="-fx-font-weight: bold;">
+                                <font>
+                                    <Font size="16.0" />
+                                </font>
+                            </Label>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- Payment Status Card -->
+                <VBox spacing="15.0"
+                      style="-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e2a4a, #263050); -fx-background-radius: 15; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 3);">
+
+                    <Label text="Estado de Pago" textFill="white"
+                           style="-fx-font-weight: bold;">
+                        <font>
+                            <Font size="18.0" />
+                        </font>
+                    </Label>
+
+                    <VBox spacing="12.0">
+                        <HBox>
+                            <Label text="Pagado" textFill="#90a4ae" prefWidth="100.0">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label text="72.75" textFill="#4caf50">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                        </HBox>
+
+                        <HBox>
+                            <Label text="Pendiente" textFill="#90a4ae" prefWidth="100.0">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label text="6.50" textFill="#ff9800">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                        </HBox>
+                    </VBox>
+
+                    <HBox spacing="10.0" style="-fx-padding: 15 0 0 0;">
+                        <Button text="⬇ Descargar Ticket"
+                                prefHeight="40.0" prefWidth="130.0"
+                                style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white; -fx-background-radius: 8; -fx-border-color: rgba(255,255,255,0.2); -fx-border-radius: 8; -fx-font-size: 12px; -fx-cursor: hand;">
+                        </Button>
+
+                        <Button text="✉ Enviar por correo"
+                                prefHeight="40.0" prefWidth="130.0"
+                                style="-fx-background-color: #2196f3; -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-font-size: 12px; -fx-cursor: hand;">
+                        </Button>
+                    </HBox>
+                </VBox>
+
+                <!-- Features Coming Soon -->
+                <VBox spacing="15.0"
+                      style="-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e2a4a, #263050); -fx-background-radius: 15; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 3);">
+
+                    <Label text="Próximamente podrás:" textFill="white"
+                           style="-fx-font-weight: bold;">
+                        <font>
+                            <Font size="16.0" />
+                        </font>
+                    </Label>
+
+                    <VBox spacing="8.0">
+                        <Label text="📅 Ver reservaciones detalladas"
+                               textFill="#90a4ae">
+                            <font>
+                                <Font size="13.0" />
+                            </font>
+                        </Label>
+
+                        <Label text="🎫 Descargar boletos en PDF"
+                               textFill="#90a4ae">
+                            <font>
+                                <Font size="13.0" />
+                            </font>
+                        </Label>
+
+                        <Label text="❌ Cancelar reservaciones"
+                               textFill="#90a4ae">
+                            <font>
+                                <Font size="13.0" />
+                            </font>
+                        </Label>
+
+                        <Label text="⭐ Calificar películas vistas"
+                               textFill="#90a4ae">
+                            <font>
+                                <Font size="13.0" />
+                            </font>
+                        </Label>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </HBox>
+    </center>
+
+    <!-- Footer Information -->
+    <bottom>
+        <HBox style="-fx-background-color: rgba(0,0,0,0.2); -fx-padding: 15; -fx-alignment: center;">
+            <Label text="Mostrando últimos movimientos. Selecciona una reserva para ver detalles completos."
+                   textFill="#546e7a"
+                   style="-fx-text-alignment: center;">
+                <font>
+                    <Font size="12.0" />
+                </font>
+            </Label>
+        </HBox>
+    </bottom>
+
+</BorderPane>

@@ -4,16 +4,17 @@ import java.time.LocalDateTime;
 
 public class Reserva {
     private int idReserva;
-    private LocalDateTime fechaReserva; // datetime en la BD
+    private LocalDateTime fechaReserva;
     private String estado;
-    private int usuarioIdUsuario; // Usuario_ID_Usuario en la BD
-    private int funcionIdFuncion; // Funcion_ID_Funcion en la BD
+    private int usuarioIdUsuario;
+    private int funcionIdFuncion;
 
     // Constructor vacío
     public Reserva() {}
 
     // Constructor completo
-    public Reserva(int idReserva, LocalDateTime fechaReserva, String estado, int usuarioIdUsuario, int funcionIdFuncion) {
+    public Reserva(int idReserva, LocalDateTime fechaReserva, String estado,
+                   int usuarioIdUsuario, int funcionIdFuncion) {
         this.idReserva = idReserva;
         this.fechaReserva = fechaReserva;
         this.estado = estado;
@@ -22,7 +23,8 @@ public class Reserva {
     }
 
     // Constructor sin ID (para insertar)
-    public Reserva(LocalDateTime fechaReserva, String estado, int usuarioIdUsuario, int funcionIdFuncion) {
+    public Reserva(LocalDateTime fechaReserva, String estado,
+                   int usuarioIdUsuario, int funcionIdFuncion) {
         this.fechaReserva = fechaReserva;
         this.estado = estado;
         this.usuarioIdUsuario = usuarioIdUsuario;

@@ -149,14 +149,7 @@ public class BookingService {
         return ids;
     }
 
-    public boolean cancelarReserva(int idReserva) {
-        try {
-            return reservaDAO.cambiarEstado(idReserva, "Cancelada");
-        } catch (Exception e) {
-            System.err.println("Error al cancelar reserva: " + e.getMessage());
-            return false;
-        }
-    }
+
 
     public DetalleReserva obtenerDetalleReserva(int idReserva) {
         try {

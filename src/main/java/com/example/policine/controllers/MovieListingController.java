@@ -47,6 +47,7 @@ public class MovieListingController implements Initializable {
     @FXML private ComboBox<String> scheduleComboBox;
     @FXML private ComboBox<String> roomComboBox;
     @FXML private DatePicker datePicker;
+    @FXML private Button myReservationsButton;
 
     // Main content
     @FXML private ScrollPane moviesScrollPane;
@@ -105,26 +106,17 @@ public class MovieListingController implements Initializable {
         loadMovies();
     }
 
+    // UI Setup Methods
     private void setupEnhancedUI() {
-        // Logo rotation animation on hover
         setupLogoAnimation();
-
-        // Enhanced search field interactions
         setupSearchFieldAnimations();
-
-        // Enhanced button hover effects
         setupButtonHoverEffects();
-
-        // Panel slide animation setup
         setupPanelAnimations();
     }
 
     private void setupLogoAnimation() {
-        // Subtle rotation animation for logo on hover
         logoImageView.setOnMouseEntered(e -> {
-            if (logoRotationAnimation != null) {
-                logoRotationAnimation.stop();
-            }
+            if (logoRotationAnimation != null) logoRotationAnimation.stop();
             logoRotationAnimation = new Timeline(
                     new KeyFrame(Duration.millis(300),
                             new KeyValue(logoImageView.rotateProperty(), 15, Interpolator.EASE_OUT))
@@ -133,9 +125,7 @@ public class MovieListingController implements Initializable {
         });
 
         logoImageView.setOnMouseExited(e -> {
-            if (logoRotationAnimation != null) {
-                logoRotationAnimation.stop();
-            }
+            if (logoRotationAnimation != null) logoRotationAnimation.stop();
             logoRotationAnimation = new Timeline(
                     new KeyFrame(Duration.millis(300),
                             new KeyValue(logoImageView.rotateProperty(), 0, Interpolator.EASE_OUT))
@@ -145,11 +135,9 @@ public class MovieListingController implements Initializable {
     }
 
     private void setupSearchFieldAnimations() {
-        // Enhanced focus effects for search field
         searchField.focusedProperty().addListener((obs, oldVal, newVal) -> {
             Timeline focusAnimation = new Timeline();
             if (newVal) {
-                // Focus gained
                 focusAnimation.getKeyFrames().add(
                         new KeyFrame(Duration.millis(200),
                                 new KeyValue(searchField.scaleXProperty(), 1.02, Interpolator.EASE_OUT),
@@ -157,7 +145,6 @@ public class MovieListingController implements Initializable {
                 );
                 searchField.setStyle(searchField.getStyle() + "; -fx-border-color: #0ea5e9;");
             } else {
-                // Focus lost
                 focusAnimation.getKeyFrames().add(
                         new KeyFrame(Duration.millis(200),
                                 new KeyValue(searchField.scaleXProperty(), 1.0, Interpolator.EASE_OUT),
@@ -170,12 +157,7 @@ public class MovieListingController implements Initializable {
     }
 
     private void setupButtonHoverEffects() {
-        // Enhanced hover effects for close button
         setupCloseButtonEffects();
-
-        // Enhanced hover effects for date buttons (applied in updateDateButtons method)
-
-        // Enhanced hover effects for book seats button
         setupBookSeatsButtonEffects();
     }
 
@@ -224,18 +206,19 @@ public class MovieListingController implements Initializable {
     }
 
     private void setupPanelAnimations() {
-        // Initial setup for panel animations
-        showtimesPanel.setTranslateX(400); // Start off-screen
+        showtimesPanel.setTranslateX(400);
     }
 
     private void setupFilterControls() {
-        // Load genres from database
         loadGenres();
 
-        // Setup schedule options
-        scheduleComboBox.getItems().addAll("Todos", "Matutino (06:00-12:00)", "Vespertino (12:00-18:00)", "Nocturno (18:00-00:00)");
+        scheduleComboBox.getItems().addAll(
+                "Todos",
+                "Matutino (06:00-12:00)",
+                "Vespertino (12:00-18:00)",
+                "Nocturno (18:00-00:00)"
+        );
 
-        // Load rooms from database
         loadRooms();
 
         // Set default values
@@ -243,13 +226,16 @@ public class MovieListingController implements Initializable {
         scheduleComboBox.setValue("Todos");
         roomComboBox.setValue("Todas");
         datePicker.setValue(LocalDate.now());
+
+        // Add listeners for real-time filtering
+        genreComboBox.valueProperty().addListener((obs, oldVal, newVal) -> filterMovies());
+        scheduleComboBox.valueProperty().addListener((obs, oldVal, newVal) -> filterMovies());
+        roomComboBox.valueProperty().addListener((obs, oldVal, newVal) -> filterMovies());
     }
 
     private void loadGenres() {
         try {
             allPeliculas = peliculaDAO.listarTodos();
-
-            // Extract unique genres
             List<String> genres = allPeliculas.stream()
                     .map(Pelicula::getGenero)
                     .distinct()
@@ -259,7 +245,6 @@ public class MovieListingController implements Initializable {
             genreComboBox.getItems().clear();
             genreComboBox.getItems().add("Todos");
             genreComboBox.getItems().addAll(genres);
-
         } catch (Exception e) {
             System.err.println("Error loading genres: " + e.getMessage());
             showAlert("Error", "No se pudieron cargar los géneros desde la base de datos", Alert.AlertType.ERROR);
@@ -269,14 +254,12 @@ public class MovieListingController implements Initializable {
     private void loadRooms() {
         try {
             allSalas = salaDAO.listarTodos();
-
             roomComboBox.getItems().clear();
             roomComboBox.getItems().add("Todas");
 
             for (Sala sala : allSalas) {
                 roomComboBox.getItems().add(sala.getNombreSala());
             }
-
         } catch (Exception e) {
             System.err.println("Error loading rooms: " + e.getMessage());
             showAlert("Error", "No se pudieron cargar las salas desde la base de datos", Alert.AlertType.ERROR);
@@ -285,13 +268,9 @@ public class MovieListingController implements Initializable {
 
     private void loadInitialData() {
         try {
-            // Load all movies
             allPeliculas = peliculaDAO.listarTodos();
             filteredPeliculas = allPeliculas;
-
-            // Load all rooms
             allSalas = salaDAO.listarTodos();
-
         } catch (Exception e) {
             System.err.println("Error loading initial data: " + e.getMessage());
             showAlert("Error", "No se pudieron cargar los datos desde la base de datos", Alert.AlertType.ERROR);
@@ -299,7 +278,6 @@ public class MovieListingController implements Initializable {
     }
 
     private void loadMovies() {
-        // Clear existing movies with fade out animation
         if (!moviesFlowPane.getChildren().isEmpty()) {
             FadeTransition fadeOut = new FadeTransition(Duration.millis(200), moviesFlowPane);
             fadeOut.setFromValue(1.0);
@@ -317,60 +295,110 @@ public class MovieListingController implements Initializable {
     private void addMoviesWithAnimation() {
         try {
             if (filteredPeliculas.isEmpty()) {
-                Label noMoviesLabel = new Label("No se encontraron películas con los filtros aplicados");
-                noMoviesLabel.setTextFill(javafx.scene.paint.Color.WHITE);
-                noMoviesLabel.setFont(Font.font(16));
-                noMoviesLabel.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 3, 0, 0, 1);");
-                moviesFlowPane.getChildren().add(noMoviesLabel);
-
-                // Fade in the no movies message
-                FadeTransition fadeIn = new FadeTransition(Duration.millis(300), moviesFlowPane);
-                fadeIn.setFromValue(0.3);
-                fadeIn.setToValue(1.0);
-                fadeIn.play();
+                displayNoMoviesMessage();
                 return;
             }
 
-            // Add movies with staggered animation
             Timeline staggeredAnimation = new Timeline();
             for (int i = 0; i < filteredPeliculas.size(); i++) {
-                final int index = i;
                 final Pelicula pelicula = filteredPeliculas.get(i);
-
                 KeyFrame keyFrame = new KeyFrame(
-                        Duration.millis(i * 50), // Stagger by 50ms
+                        Duration.millis(i * 50),
                         e -> {
                             VBox movieCard = createMovieCard(pelicula);
                             moviesFlowPane.getChildren().add(movieCard);
-
-                            // Individual card animation
-                            movieCard.setOpacity(0);
-                            movieCard.setScaleX(0.8);
-                            movieCard.setScaleY(0.8);
-
-                            Timeline cardAnimation = new Timeline(
-                                    new KeyFrame(Duration.millis(300),
-                                            new KeyValue(movieCard.opacityProperty(), 1.0, Interpolator.EASE_OUT),
-                                            new KeyValue(movieCard.scaleXProperty(), 1.0, Interpolator.EASE_OUT),
-                                            new KeyValue(movieCard.scaleYProperty(), 1.0, Interpolator.EASE_OUT))
-                            );
-                            cardAnimation.play();
+                            animateMovieCard(movieCard);
                         }
                 );
                 staggeredAnimation.getKeyFrames().add(keyFrame);
             }
 
-            // Fade in the container
             FadeTransition fadeIn = new FadeTransition(Duration.millis(200), moviesFlowPane);
             fadeIn.setFromValue(0.3);
             fadeIn.setToValue(1.0);
             fadeIn.setOnFinished(e -> staggeredAnimation.play());
             fadeIn.play();
-
         } catch (Exception e) {
             System.err.println("Error loading movies: " + e.getMessage());
             showAlert("Error", "Error al cargar las películas", Alert.AlertType.ERROR);
         }
+    }
+
+    private void displayNoMoviesMessage() {
+        VBox messageContainer = new VBox(20);
+        messageContainer.setStyle("-fx-alignment: center; -fx-padding: 50;");
+
+        Label icon = new Label("🎬");
+        icon.setStyle("-fx-font-size: 48px;");
+
+        Label titleLabel = new Label("No se encontraron películas");
+        titleLabel.setTextFill(javafx.scene.paint.Color.WHITE);
+        titleLabel.setFont(Font.font("System Bold", 24));
+        titleLabel.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 3, 0, 0, 1);");
+
+        String searchTerm = searchField.getText().trim();
+        String genre = genreComboBox.getValue();
+
+        StringBuilder messageBuilder = new StringBuilder("No hay películas disponibles");
+        if (!searchTerm.isEmpty() || (genre != null && !genre.equals("Todos"))) {
+            messageBuilder.append(" que coincidan con los filtros:");
+            if (!searchTerm.isEmpty()) {
+                messageBuilder.append("\n• Búsqueda: \"").append(searchTerm).append("\"");
+            }
+            if (genre != null && !genre.equals("Todos")) {
+                messageBuilder.append("\n• Género: ").append(genre);
+            }
+        }
+
+        Label messageLabel = new Label(messageBuilder.toString());
+        messageLabel.setTextFill(javafx.scene.paint.Color.LIGHTGRAY);
+        messageLabel.setFont(Font.font(16));
+        messageLabel.setWrapText(true);
+        messageLabel.setMaxWidth(400);
+        messageLabel.setStyle("-fx-text-alignment: center; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 2, 0, 0, 1);");
+
+        Button clearFiltersButton = new Button("Limpiar Filtros");
+        clearFiltersButton.setStyle(
+                "-fx-background-color: #3182ce; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-background-radius: 8; " +
+                        "-fx-border-radius: 8; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-padding: 10 20; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(49,130,206,0.4), 4, 0, 0, 2);"
+        );
+        clearFiltersButton.setOnAction(e -> clearAllFilters());
+
+        messageContainer.getChildren().addAll(icon, titleLabel, messageLabel, clearFiltersButton);
+        moviesFlowPane.getChildren().add(messageContainer);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(300), moviesFlowPane);
+        fadeIn.setFromValue(0.3);
+        fadeIn.setToValue(1.0);
+        fadeIn.play();
+    }
+
+    private void clearAllFilters() {
+        searchField.clear();
+        genreComboBox.setValue("Todos");
+        scheduleComboBox.setValue("Todos");
+        roomComboBox.setValue("Todas");
+        datePicker.setValue(LocalDate.now());
+        filterMovies();
+    }
+
+    private void animateMovieCard(VBox movieCard) {
+        movieCard.setOpacity(0);
+        movieCard.setScaleX(0.8);
+        movieCard.setScaleY(0.8);
+
+        Timeline cardAnimation = new Timeline(
+                new KeyFrame(Duration.millis(300),
+                        new KeyValue(movieCard.opacityProperty(), 1.0, Interpolator.EASE_OUT),
+                        new KeyValue(movieCard.scaleXProperty(), 1.0, Interpolator.EASE_OUT),
+                        new KeyValue(movieCard.scaleYProperty(), 1.0, Interpolator.EASE_OUT))
+        );
+        cardAnimation.play();
     }
 
     private VBox createMovieCard(Pelicula pelicula) {
@@ -381,20 +409,17 @@ public class MovieListingController implements Initializable {
         movieCard.setSpacing(12);
         movieCard.setStyle("-fx-background-color: #2d3748; -fx-background-radius: 12; -fx-padding: 18; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 3);");
 
-        // Enhanced hover effects for movie cards
         setupMovieCardHoverEffects(movieCard);
 
-        // Movie poster container with enhanced styling
+        // Movie poster container
         StackPane posterContainer = new StackPane();
         posterContainer.setPrefSize(194, 290);
-        posterContainer.setMinSize(174, 260);
-        posterContainer.setMaxSize(230, 320);
         posterContainer.setStyle("-fx-background-color: #4a5568; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0, 0, 2);");
 
-        // Try to load image, use placeholder if not found
+        // Try to load image
         ImageView poster = new ImageView();
         try {
-            String imagePath = "@../../../images/" + pelicula.getTitulo().toLowerCase().replaceAll("[^a-zA-Z0-9]", "") + ".jpg";
+            String imagePath = "/images/" + pelicula.getTitulo().toLowerCase().replaceAll("[^a-zA-Z0-9]", "") + ".jpg";
             Image image = new Image(getClass().getResourceAsStream(imagePath));
             poster.setImage(image);
             poster.setFitWidth(194);
@@ -403,7 +428,6 @@ public class MovieListingController implements Initializable {
             poster.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 4, 0, 0, 1);");
             posterContainer.getChildren().add(poster);
         } catch (Exception e) {
-            // Enhanced placeholder with better styling
             Label placeholder = new Label(pelicula.getTitulo().length() > 15 ?
                     pelicula.getTitulo().substring(0, 15) + "..." : pelicula.getTitulo());
             placeholder.setTextFill(javafx.scene.paint.Color.WHITE);
@@ -414,9 +438,8 @@ public class MovieListingController implements Initializable {
             posterContainer.getChildren().add(placeholder);
         }
 
-        // Enhanced movie info section
-        VBox movieInfo = new VBox();
-        movieInfo.setSpacing(6);
+        // Movie info section
+        VBox movieInfo = new VBox(6);
 
         Label titleLabel = new Label(pelicula.getTitulo());
         titleLabel.setTextFill(javafx.scene.paint.Color.WHITE);
@@ -425,9 +448,7 @@ public class MovieListingController implements Initializable {
         titleLabel.setMaxWidth(210);
         titleLabel.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 2, 0, 0, 1);");
 
-        HBox detailsBox = new HBox();
-        detailsBox.setSpacing(10);
-
+        HBox detailsBox = new HBox(10);
         Label ratingLabel = new Label("📊 " + pelicula.getClasificacion());
         ratingLabel.setTextFill(javafx.scene.paint.Color.LIGHTGRAY);
         ratingLabel.setFont(Font.font(11));
@@ -447,7 +468,7 @@ public class MovieListingController implements Initializable {
         viewShowtimesButton.setPrefHeight(38);
         viewShowtimesButton.setStyle("-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #3182ce, #2c5aa0); -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(49,130,206,0.4), 4, 0, 0, 2);");
 
-        // Enhanced button hover effect
+        // Button hover effects
         viewShowtimesButton.setOnMouseEntered(e -> {
             Timeline hoverIn = new Timeline(
                     new KeyFrame(Duration.millis(150),
@@ -483,13 +504,11 @@ public class MovieListingController implements Initializable {
                             new KeyValue(movieCard.translateYProperty(), -3, Interpolator.EASE_OUT))
             );
 
-            // Enhanced shadow effect
             String hoveredStyle = movieCard.getStyle().replace(
                     "dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 3)",
                     "dropshadow(gaussian, rgba(0,0,0,0.5), 12, 0, 0, 6)"
             );
             movieCard.setStyle(hoveredStyle);
-
             hoverIn.play();
         });
 
@@ -501,51 +520,26 @@ public class MovieListingController implements Initializable {
                             new KeyValue(movieCard.translateYProperty(), 0, Interpolator.EASE_OUT))
             );
 
-            // Restore original shadow
             String originalStyle = movieCard.getStyle().replace(
                     "dropshadow(gaussian, rgba(0,0,0,0.5), 12, 0, 0, 6)",
                     "dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 3)"
             );
             movieCard.setStyle(originalStyle);
-
             hoverOut.play();
         });
     }
 
-    private void addMovieCard(Pelicula pelicula) {
-        // This method is replaced by createMovieCard for better organization
-        VBox movieCard = createMovieCard(pelicula);
-        moviesFlowPane.getChildren().add(movieCard);
-    }
-
     private void setupShowtimesPanel() {
-        // Initially hide the showtimes panel
         showtimesPanel.setVisible(false);
-
-        // Set today as default
         selectToday();
     }
 
-    // Event handlers for search and filters
+    // Event handlers
     @FXML
     private void onSearchKeyReleased(KeyEvent event) {
         filterMovies();
     }
 
-    @FXML
-    private void onGenreFilterChanged() {
-        filterMovies();
-    }
-
-    @FXML
-    private void onScheduleFilterChanged() {
-        filterMovies();
-    }
-
-    @FXML
-    private void onRoomFilterChanged() {
-        filterMovies();
-    }
 
     @FXML
     private void onDateChanged() {
@@ -555,41 +549,98 @@ public class MovieListingController implements Initializable {
         }
     }
 
+    @FXML
+    private void openMyReservations() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/policine/history.fxml"));
+            Parent historyRoot = loader.load();
+
+            Stage currentStage = (Stage) myReservationsButton.getScene().getWindow();
+            Scene historyScene = new Scene(historyRoot);
+            currentStage.setScene(historyScene);
+            currentStage.setTitle("Cinemax - Mis Reservas");
+            currentStage.centerOnScreen();
+
+            System.out.println("Navegando a historial de reservas");
+        } catch (IOException e) {
+            System.err.println("Error al abrir historial de reservas: " + e.getMessage());
+            showAlert("Error", "No se pudo abrir el historial de reservas", Alert.AlertType.ERROR);
+        }
+    }
+
     private void filterMovies() {
         try {
             String searchText = searchField.getText().toLowerCase().trim();
             String selectedGenre = genreComboBox.getValue();
+            String selectedSchedule = scheduleComboBox.getValue();
+            String selectedRoom = roomComboBox.getValue();
+            LocalDate filterDate = datePicker.getValue();
 
             filteredPeliculas = allPeliculas.stream()
                     .filter(pelicula -> {
-                        // Filter by search text
+                        // Filter by search text (title, genre, or any text content)
                         if (!searchText.isEmpty()) {
-                            return pelicula.getTitulo().toLowerCase().contains(searchText);
+                            return pelicula.getTitulo().toLowerCase().contains(searchText) ||
+                                    pelicula.getGenero().toLowerCase().contains(searchText) ||
+                                    pelicula.getClasificacion().toLowerCase().contains(searchText);
                         }
                         return true;
                     })
                     .filter(pelicula -> {
                         // Filter by genre
-                        if (selectedGenre != null && !selectedGenre.equals("Todos")) {
-                            return pelicula.getGenero().equals(selectedGenre);
+                        return selectedGenre == null || selectedGenre.equals("Todos") ||
+                                pelicula.getGenero().equals(selectedGenre);
+                    })
+                    .filter(pelicula -> {
+                        // Filter by schedule and room availability
+                        if ((selectedSchedule != null && !selectedSchedule.equals("Todos")) ||
+                                (selectedRoom != null && !selectedRoom.equals("Todas")) ||
+                                filterDate != null) {
+
+                            return hasAvailableFunctions(pelicula, selectedSchedule, selectedRoom, filterDate);
                         }
                         return true;
                     })
                     .collect(Collectors.toList());
 
             loadMovies();
-
         } catch (Exception e) {
             System.err.println("Error filtering movies: " + e.getMessage());
         }
     }
 
-    // Showtimes panel event handlers with enhanced animations
+    private boolean hasAvailableFunctions(Pelicula pelicula, String schedule, String room, LocalDate date) {
+        try {
+            LocalDate searchDate = (date != null) ? date : LocalDate.now();
+            List<Funcion> funciones = funcionDAO.buscarPorPeliculaYFecha(pelicula.getIdPelicula(), searchDate);
+
+            if (funciones.isEmpty()) return false;
+
+            return funciones.stream().anyMatch(funcion -> {
+                boolean matchesSchedule = matchesScheduleFilter(funcion.getHora(), schedule);
+                boolean matchesRoom = true;
+
+                if (room != null && !room.equals("Todas")) {
+                    try {
+                        Sala sala = salaDAO.buscarPorId(funcion.getIdSala());
+                        matchesRoom = (sala != null && sala.getNombreSala().equals(room));
+                    } catch (Exception e) {
+                        matchesRoom = false;
+                    }
+                }
+
+                return matchesSchedule && matchesRoom;
+            });
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // Showtimes panel methods
     private void showMovieShowtimes(Pelicula pelicula) {
         selectedMovie = pelicula;
         selectedMovieTitle.setText("🎬 Funciones de " + pelicula.getTitulo());
 
-        // Animate panel slide in
         showtimesPanel.setVisible(true);
         Timeline slideIn = new Timeline(
                 new KeyFrame(Duration.millis(300),
@@ -602,7 +653,6 @@ public class MovieListingController implements Initializable {
 
     @FXML
     private void closeShowtimesPanel() {
-        // Animate panel slide out
         Timeline slideOut = new Timeline(
                 new KeyFrame(Duration.millis(250),
                         new KeyValue(showtimesPanel.translateXProperty(), 400, Interpolator.EASE_IN))
@@ -615,7 +665,7 @@ public class MovieListingController implements Initializable {
         slideOut.play();
     }
 
-    // Date selection handlers with enhanced button styling
+    // Date selection handlers
     @FXML
     private void selectToday() {
         selectedDate = LocalDate.now();
@@ -670,7 +720,6 @@ public class MovieListingController implements Initializable {
     }
 
     private void updateDateButtons(String selectedDay) {
-        // Reset all buttons to default style with enhanced effects
         String defaultStyle = "-fx-background-color: #4a5568; -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 1);";
         String selectedStyle = "-fx-background-color: #3182ce; -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(49,130,206,0.4), 4, 0, 0, 2); -fx-font-weight: bold;";
 
@@ -683,7 +732,6 @@ public class MovieListingController implements Initializable {
 
             if (buttonId.equals(selectedDay)) {
                 button.setStyle(selectedStyle);
-                // Add a subtle pulse animation for the selected button
                 Timeline pulseAnimation = new Timeline(
                         new KeyFrame(Duration.millis(200),
                                 new KeyValue(button.scaleXProperty(), 1.05, Interpolator.EASE_OUT),
@@ -695,12 +743,10 @@ public class MovieListingController implements Initializable {
                 pulseAnimation.play();
             } else {
                 button.setStyle(defaultStyle);
-                // Ensure other buttons return to normal scale
                 button.setScaleX(1.0);
                 button.setScaleY(1.0);
             }
 
-            // Add hover effects for all buttons
             setupDateButtonHoverEffects(button, buttonId.equals(selectedDay));
         }
     }
@@ -742,7 +788,6 @@ public class MovieListingController implements Initializable {
     }
 
     private void loadShowtimesForDate(LocalDate date) {
-        // Fade out current showtimes
         if (!showtimesContainer.getChildren().isEmpty()) {
             FadeTransition fadeOut = new FadeTransition(Duration.millis(150), showtimesContainer);
             fadeOut.setFromValue(1.0);
@@ -761,30 +806,24 @@ public class MovieListingController implements Initializable {
         if (selectedMovie == null) return;
 
         try {
-            // Get functions for the selected movie and date
             List<Funcion> funciones = funcionDAO.buscarPorPeliculaYFecha(selectedMovie.getIdPelicula(), date);
 
             if (funciones.isEmpty()) {
-                Label noShowtimesLabel = new Label("📅 No hay funciones disponibles para esta fecha");
-                noShowtimesLabel.setTextFill(javafx.scene.paint.Color.LIGHTGRAY);
-                noShowtimesLabel.setFont(Font.font(14));
-                noShowtimesLabel.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0, 0, 1);");
-                showtimesContainer.getChildren().add(noShowtimesLabel);
+                displayNoShowtimesMessage("📅 No hay funciones disponibles para esta fecha");
                 fadeInShowtimes();
                 return;
             }
 
-            // Filter by schedule if selected
+            // Apply filters
             String selectedSchedule = scheduleComboBox.getValue();
-            if (!selectedSchedule.equals("Todos")) {
+            if (selectedSchedule != null && !selectedSchedule.equals("Todos")) {
                 funciones = funciones.stream()
                         .filter(funcion -> matchesScheduleFilter(funcion.getHora(), selectedSchedule))
                         .collect(Collectors.toList());
             }
 
-            // Filter by room if selected
             String selectedRoom = roomComboBox.getValue();
-            if (!selectedRoom.equals("Todas")) {
+            if (selectedRoom != null && !selectedRoom.equals("Todas")) {
                 Sala targetSala = allSalas.stream()
                         .filter(sala -> sala.getNombreSala().equals(selectedRoom))
                         .findFirst().orElse(null);
@@ -797,34 +836,40 @@ public class MovieListingController implements Initializable {
                 }
             }
 
-            // Add showtime items with staggered animation
             if (funciones.isEmpty()) {
-                Label noFilteredShowtimesLabel = new Label("🔍 No hay funciones que coincidan con los filtros aplicados");
-                noFilteredShowtimesLabel.setTextFill(javafx.scene.paint.Color.LIGHTGRAY);
-                noFilteredShowtimesLabel.setFont(Font.font(14));
-                noFilteredShowtimesLabel.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0, 0, 1);");
-                showtimesContainer.getChildren().add(noFilteredShowtimesLabel);
-            } else {
-                Timeline staggeredShowtimes = new Timeline();
-                for (int i = 0; i < funciones.size(); i++) {
-                    final Funcion funcion = funciones.get(i);
-                    KeyFrame keyFrame = new KeyFrame(
-                            Duration.millis(i * 100), // Stagger by 100ms
-                            e -> addShowtimeItem(funcion)
-                    );
-                    staggeredShowtimes.getKeyFrames().add(keyFrame);
-                }
-                staggeredShowtimes.setOnFinished(e -> fadeInShowtimes());
-                staggeredShowtimes.play();
+                displayNoShowtimesMessage("🔍 No hay funciones que coincidan con los filtros aplicados");
+                fadeInShowtimes();
                 return;
             }
 
-            fadeInShowtimes();
+            // Add showtime items with staggered animation
+            Timeline staggeredShowtimes = new Timeline();
+            for (int i = 0; i < funciones.size(); i++) {
+                final Funcion funcion = funciones.get(i);
+                KeyFrame keyFrame = new KeyFrame(
+                        Duration.millis(i * 100),
+                        e -> addShowtimeItem(funcion)
+                );
+                staggeredShowtimes.getKeyFrames().add(keyFrame);
+            }
+            staggeredShowtimes.setOnFinished(e -> fadeInShowtimes());
+            staggeredShowtimes.play();
 
         } catch (Exception e) {
             System.err.println("Error loading showtimes: " + e.getMessage());
-            showAlert("Error", "Error al cargar las funciones", Alert.AlertType.ERROR);
+            displayNoShowtimesMessage("❌ Error al cargar las funciones");
+            fadeInShowtimes();
         }
+    }
+
+    private void displayNoShowtimesMessage(String message) {
+        Label noShowtimesLabel = new Label(message);
+        noShowtimesLabel.setTextFill(javafx.scene.paint.Color.LIGHTGRAY);
+        noShowtimesLabel.setFont(Font.font(14));
+        noShowtimesLabel.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0, 0, 1);");
+        noShowtimesLabel.setWrapText(true);
+        noShowtimesLabel.setMaxWidth(300);
+        showtimesContainer.getChildren().add(noShowtimesLabel);
     }
 
     private void fadeInShowtimes() {
@@ -835,6 +880,10 @@ public class MovieListingController implements Initializable {
     }
 
     private boolean matchesScheduleFilter(LocalTime hora, String scheduleFilter) {
+        if (scheduleFilter == null || scheduleFilter.equals("Todos")) {
+            return true;
+        }
+
         switch (scheduleFilter) {
             case "Matutino (06:00-12:00)":
                 return hora.isAfter(LocalTime.of(5, 59)) && hora.isBefore(LocalTime.of(12, 1));
@@ -849,7 +898,6 @@ public class MovieListingController implements Initializable {
 
     private void addShowtimeItem(Funcion funcion) {
         try {
-            // Get sala information
             Sala sala = salaDAO.buscarPorId(funcion.getIdSala());
             if (sala == null) return;
 
@@ -858,11 +906,9 @@ public class MovieListingController implements Initializable {
             showtimeItem.setMinHeight(55);
             showtimeItem.setStyle("-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1a202c, #2d3748); -fx-background-radius: 8; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 4, 0, 0, 2);");
 
-            // Enhanced hover effects for showtime items
             setupShowtimeItemHoverEffects(showtimeItem);
 
-            VBox leftInfo = new VBox();
-            leftInfo.setSpacing(4);
+            VBox leftInfo = new VBox(4);
 
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
             Label timeLabel = new Label("🕐 " + funcion.getHora().format(timeFormatter));
@@ -876,7 +922,6 @@ public class MovieListingController implements Initializable {
 
             leftInfo.getChildren().addAll(timeLabel, roomLabel);
 
-            // Enhanced availability label
             Label availabilityLabel = new Label("✅ Asientos\ndisponibles");
             availabilityLabel.setTextFill(javafx.scene.paint.Color.LIGHTGREEN);
             availabilityLabel.setFont(Font.font("System Bold", 10));
@@ -887,10 +932,9 @@ public class MovieListingController implements Initializable {
             showtimeItem.setLeft(leftInfo);
             showtimeItem.setRight(availabilityLabel);
 
-            // Make the item clickable with enhanced feedback
             showtimeItem.setOnMouseClicked(e -> selectShowtime(funcion, sala, showtimeItem));
 
-            // Initial animation for the item
+            // Initial animation
             showtimeItem.setOpacity(0);
             showtimeItem.setScaleX(0.9);
             showtimeItem.setScaleY(0.9);
@@ -923,7 +967,6 @@ public class MovieListingController implements Initializable {
                     "dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0, 0, 3)"
             );
             showtimeItem.setStyle(hoveredStyle + "; -fx-cursor: hand;");
-
             hoverIn.play();
         });
 
@@ -939,7 +982,6 @@ public class MovieListingController implements Initializable {
                             "dropshadow(gaussian, rgba(0,0,0,0.3), 4, 0, 0, 2)")
                     .replace("; -fx-cursor: hand;", "");
             showtimeItem.setStyle(originalStyle);
-
             hoverOut.play();
         });
     }
@@ -994,15 +1036,14 @@ public class MovieListingController implements Initializable {
     @FXML
     private void bookSeats() throws IOException {
         if (selectedFuncion == null) {
-            showEnhancedAlert("⚠️ Selección requerida", "Por favor selecciona una función", Alert.AlertType.WARNING);
+            showAlert("⚠️ Selección requerida", "Por favor selecciona una función", Alert.AlertType.WARNING);
             return;
         }
 
         try {
-            // Obtener datos de la sala
             Sala salaSeleccionada = salaDAO.buscarPorId(selectedFuncion.getIdSala());
             if (salaSeleccionada == null) {
-                showEnhancedAlert("❌ Error", "Error al cargar información de la sala", Alert.AlertType.ERROR);
+                showAlert("❌ Error", "Error al cargar información de la sala", Alert.AlertType.ERROR);
                 return;
             }
 
@@ -1022,16 +1063,13 @@ public class MovieListingController implements Initializable {
 
             loadingAnimation.setOnFinished(e -> {
                 try {
-                    // Guardar datos en la sesión
                     BookingSession session = BookingSession.getInstance();
-                    session.reset(); // Limpiar sesión anterior
+                    session.reset();
                     session.setMovieData(selectedMovie, selectedFuncion, salaSeleccionada);
 
-                    // Cargar la siguiente pantalla
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/policine/seatSelection.fxml"));
                     Parent seatSelectionRoot = loader.load();
 
-                    // Obtener el controlador y pasarle los datos
                     SeatSelectionController controller = loader.getController();
                     controller.initializeWithSessionData();
 
@@ -1045,9 +1083,8 @@ public class MovieListingController implements Initializable {
 
                 } catch (Exception ex) {
                     System.err.println("Error al navegar a selección de asientos: " + ex.getMessage());
-                    showEnhancedAlert("❌ Error", "Error al cargar la selección de asientos", Alert.AlertType.ERROR);
+                    showAlert("❌ Error", "Error al cargar la selección de asientos", Alert.AlertType.ERROR);
 
-                    // Restore button
                     bookSeatsButton.setText(originalText);
                     bookSeatsButton.setDisable(false);
                 }
@@ -1057,21 +1094,16 @@ public class MovieListingController implements Initializable {
 
         } catch (Exception e) {
             System.err.println("Error al navegar a selección de asientos: " + e.getMessage());
-            showEnhancedAlert("❌ Error", "Error al cargar la selección de asientos", Alert.AlertType.ERROR);
+            showAlert("❌ Error", "Error al cargar la selección de asientos", Alert.AlertType.ERROR);
         }
     }
 
     private void showAlert(String title, String message, Alert.AlertType alertType) {
-        showEnhancedAlert(title, message, alertType);
-    }
-
-    private void showEnhancedAlert(String title, String message, Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
 
-        // Enhanced alert styling
         alert.getDialogPane().setStyle(
                 "-fx-background-color: #2d3748; " +
                         "-fx-text-fill: white; " +
@@ -1081,7 +1113,6 @@ public class MovieListingController implements Initializable {
                         "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 5);"
         );
 
-        // Style the buttons
         alert.getDialogPane().lookupButton(ButtonType.OK).setStyle(
                 "-fx-background-color: #3182ce; " +
                         "-fx-text-fill: white; " +
@@ -1093,3 +1124,5 @@ public class MovieListingController implements Initializable {
         alert.showAndWait();
     }
 }
+
+
